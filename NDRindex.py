@@ -43,10 +43,14 @@ class NDRindex:
                         clusters.append([points.pop(closest_point_index)])
         return clusters
 
-    def calculate_final_index(self, clusters):
+    def calculate_final_index(self, data, clusters):
         # Calculate the final index
         final_index = 0
-        # TODO: Calculate the final index as described in the paper
+        for cluster in clusters:
+            cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
+            distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
+            cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
+            final_index += 1 / cluster_radius  # add the reciprocal of the cluster radius to the final index
         return final_index
 
     def evaluate_data_quality(self, data):
