@@ -26,7 +26,21 @@ class NDRindex:
         # Perform clustering and find the point gathering areas
         average_scale = self.calculate_average_scale(data)
         clusters = []
-        # TODO: Implement the clustering algorithm as described in the paper
+        points = list(range(data.shape[0]))  # list of point indices
+        np.random.shuffle(points)  # randomize the order of points
+
+        while points:
+            if not clusters:  # if there are no clusters, create the first one
+                clusters.append([points.pop()])  # pop a point and create a cluster with it
+            else:
+                for cluster in clusters:
+                    cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
+                    distances = np.linalg.norm(data[points] - cluster_center, axis=1)  # distances from the center to all remaining points
+                    closest_point_index = np.argmin(distances)  # index of the closest point
+                    if distances[closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
+                        cluster.append(points.pop(closest_point_index))
+                    else:  # if the closest point is not close enough, create a new cluster with it
+                        clusters.append([points.pop(closest_point_index)])
         return clusters
 
     def calculate_final_index(self, clusters):
@@ -41,8 +55,8 @@ class NDRindex:
         best_methods = None
         for normalization_method in self.normalization_methods:
             for dimension_reduction_method in self.dimension_reduction_methods:
+                pass
                 # TODO: Apply the normalization and dimensionality reduction methods to the data
                 # TODO: Calculate the final index for the preprocessed data
                 # TODO: If the final index is higher than the current best score, update the best score and best methods
         return best_methods
-
