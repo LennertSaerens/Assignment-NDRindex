@@ -61,10 +61,14 @@ class NDRindex:
             normalized_data = normalization_method(data)  # apply normalization
             for dimension_reduction_method in self.dimension_reduction_methods:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
-                clusters = self.clustering(reduced_data)  # perform clustering
-                final_index = self.calculate_final_index(reduced_data, clusters)  # calculate final index
-                if final_index > best_score:  # if the final index is higher than the current best score, update the best score and best methods
-                    best_score = final_index
+                final_index_sum = 0
+                for _ in range(100):  # run the algorithm 100 times with different starting points
+                    clusters = self.clustering(reduced_data)  # perform clustering
+                    final_index = self.calculate_final_index(reduced_data, clusters)  # calculate final index
+                    final_index_sum += final_index
+                final_index_avg = final_index_sum / 100  # average final index over the 100 runs
+                if final_index_avg > best_score:  # if the average final index is higher than the current best score, update the best score and best methods
+                    best_score = final_index_avg
                     best_methods = (normalization_method, dimension_reduction_method)
         return best_methods
 
