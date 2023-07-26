@@ -1,6 +1,4 @@
 import numpy as np
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
 from scipy.spatial.distance import pdist, squareform
 
 
@@ -74,7 +72,7 @@ class NDRindex:
                     clusters = self.clustering(reduced_data)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index
                     final_index_sum += final_index
-                final_index_avg = final_index_sum / 100  # average final index over the 100 runs
+                final_index_avg = final_index_sum / num_runs  # average final index over the total number of runs
                 if final_index_avg > best_score:  # if the average final index is higher than the current best score, update the best score and best methods
                     best_score = final_index_avg
                     best_methods = (normalization_method, dimension_reduction_method)
