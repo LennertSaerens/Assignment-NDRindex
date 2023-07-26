@@ -37,7 +37,8 @@ class NDRindex:
                     if not points:  # if there are no points left, break the loop
                         break
                     cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
-                    distances = np.linalg.norm(data[points] - cluster_center, axis=1)  # distances from the center to all remaining points
+                    distances = np.linalg.norm(data[points] - cluster_center,
+                                               axis=1)  # distances from the center to all remaining points
                     closest_point_index = np.argmin(distances)  # index of the closest point
                     if distances[
                         closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
@@ -51,10 +52,11 @@ class NDRindex:
         average_scale = self.calculate_average_scale(data)
         for cluster in clusters:
             cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
-            distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
+            distances = np.linalg.norm(data[cluster] - cluster_center,
+                                       axis=1)  # distances from the center to all points in the cluster
             cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
             R += cluster_radius
-        R /= len(clusters) # divide by the number of clusters
+        R /= len(clusters)  # divide by the number of clusters
         return 1 - (R / average_scale)
 
     def evaluate_data_quality(self, data, num_runs):
@@ -67,7 +69,8 @@ class NDRindex:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
                 final_index_sum = 0
                 for i in range(num_runs):  # run the algorithm 100 times with different starting points
-                    print(f"Executing iteration {i} for normalization: {normalization_method} ; dim red: {dimension_reduction_method}")
+                    print(
+                        f"Executing iteration {i} for normalization: {normalization_method} ; dim red: {dimension_reduction_method}")
                     clusters = self.clustering(reduced_data)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index
                     final_index_sum += final_index
@@ -76,4 +79,3 @@ class NDRindex:
                     best_score = final_index_avg
                     best_methods = (normalization_method, dimension_reduction_method)
         return best_methods, best_score
-
