@@ -35,14 +35,14 @@ def test_clustering():
     assert sum(len(cluster) for cluster in clusters) == 10  # all points should belong to a cluster
 
 
-# def test_calculate_final_index():
-#     ndr = NDRindex([], [])
-#     clusters = ndr.clustering(data)
-#     final_index = ndr.calculate_final_index(data, clusters)
-#     assert final_index > 0  # the final index should be a positive number
+def test_calculate_final_index():
+    ndr = NDRindex([], [])
+    clusters = ndr.clustering(data)
+    final_index = ndr.calculate_final_index(data, clusters)
+    assert final_index >= 0  # the final index should be a positive number
 
 
 test_calculate_distance_matrix()
 test_calculate_average_scale()
 test_clustering()
-# test_calculate_final_index()
+test_calculate_final_index()

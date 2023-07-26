@@ -52,9 +52,11 @@ class NDRindex:
         final_index = 0
         for cluster in clusters:
             cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
-            distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
+            distances = np.linalg.norm(data[cluster] - cluster_center,
+                                       axis=1)  # distances from the center to all points in the cluster
             cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
-            final_index += 1 / cluster_radius  # add the reciprocal of the cluster radius to the final index
+            if cluster_radius > 0:  # only add the reciprocal of the cluster radius to the final index if the cluster radius is not zero (cluster containing single data point)
+                final_index += 1 / cluster_radius
         return final_index
 
     def evaluate_data_quality(self, data):
