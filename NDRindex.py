@@ -56,7 +56,7 @@ class NDRindex:
             distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
             cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
             final_index += 1 - (cluster_radius / average_scale)  # add 1 - (cluster_radius / average_scale) to the final index
-        return final_index / (len(clusters) * 100)  # divide by the number of clusters and the number of runs to get the average
+        return final_index / len(clusters)  # divide by the number of clusters and the number of runs to get the average
 
     def evaluate_data_quality(self, data):
         # Evaluate the data qualities
@@ -67,7 +67,8 @@ class NDRindex:
             for dimension_reduction_method in self.dimension_reduction_methods:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
                 final_index_sum = 0
-                for _ in range(100):  # run the algorithm 100 times with different starting points
+                for i in range(100):  # run the algorithm 100 times with different starting points
+                    print(f"Executing iteration {i} for normalization: {normalization_method} ; dim red: {dimension_reduction_method}")
                     clusters = self.clustering(reduced_data)  # perform clustering
                     final_index = self.calculate_final_index(reduced_data, clusters)  # calculate final index
                     final_index_sum += final_index
