@@ -34,10 +34,14 @@ class NDRindex:
                 clusters.append([points.pop()])  # pop a point and create a cluster with it
             else:
                 for cluster in clusters:
+                    if not points:  # if there are no points left, break the loop
+                        break
                     cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
-                    distances = np.linalg.norm(data[points] - cluster_center, axis=1)  # distances from the center to all remaining points
+                    distances = np.linalg.norm(data[points] - cluster_center,
+                                               axis=1)  # distances from the center to all remaining points
                     closest_point_index = np.argmin(distances)  # index of the closest point
-                    if distances[closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
+                    if distances[
+                        closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
                         cluster.append(points.pop(closest_point_index))
                     else:  # if the closest point is not close enough, create a new cluster with it
                         clusters.append([points.pop(closest_point_index)])
