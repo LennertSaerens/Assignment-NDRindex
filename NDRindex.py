@@ -50,13 +50,13 @@ class NDRindex:
     def calculate_final_index(self, data, clusters):
         # Calculate the final index
         final_index = 0
+        average_scale = self.calculate_average_scale(data)
         for cluster in clusters:
             cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
             distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
             cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
-            if cluster_radius > 0:  # only add the reciprocal of the cluster radius to the final index if the cluster radius is not zero (cluster containing single data point)
-                final_index += 1 / cluster_radius
-        return final_index
+            final_index += 1 - (cluster_radius / average_scale)  # add 1 - (cluster_radius / average_scale) to the final index
+        return final_index / (len(clusters) * 100)  # divide by the number of clusters and the number of runs to get the average
 
     def evaluate_data_quality(self, data):
         # Evaluate the data qualities
