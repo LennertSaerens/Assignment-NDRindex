@@ -47,7 +47,6 @@ class NDRindex:
         return clusters
 
     def calculate_NDRindex(self, data, clusters):
-        # Calculate R
         R = 0
         average_scale = self.calculate_average_scale(data)
         for cluster in clusters:
@@ -55,6 +54,7 @@ class NDRindex:
             distances = np.linalg.norm(data[cluster] - cluster_center, axis=1)  # distances from the center to all points in the cluster
             cluster_radius = np.mean(distances)  # average distance, defined as the cluster radius
             R += cluster_radius
+        R /= len(clusters) # divide by the number of clusters
         return 1 - (R / average_scale)
 
     def evaluate_data_quality(self, data, num_runs):
