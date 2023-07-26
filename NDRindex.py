@@ -75,5 +75,5 @@ class NDRindex:
                 if final_index_avg > best_score:  # if the average final index is higher than the current best score, update the best score and best methods
                     best_score = final_index_avg
                     best_methods = (normalization_method, dimension_reduction_method)
-        return best_methods
+        return best_methods, best_score
 

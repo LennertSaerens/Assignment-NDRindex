@@ -29,8 +29,9 @@ def run_experiment():
     ndr = NDRindex(normalization_methods, dimension_reduction_methods)
 
     # Evaluate the data quality
-    best_methods = ndr.evaluate_data_quality(normalized_data)
+    best_methods, best_score = ndr.evaluate_data_quality(normalized_data)
     print(f"Best methods: {best_methods}")
+    print(f"Best score (NDRindex): {best_score}")
 
 
 # Run the experiment
