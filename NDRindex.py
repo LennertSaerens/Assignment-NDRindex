@@ -19,7 +19,7 @@ class NDRindex:
         distance_matrix = self.calculate_distance_matrix(data)
         M = np.percentile(distance_matrix, 25)  # lower quartile distance
         n = data.shape[0]  # number of samples
-        average_scale = M * np.log10(n)
+        average_scale = M / np.log10(n)
         return average_scale
 
     def clustering(self, data):
