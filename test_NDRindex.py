@@ -38,7 +38,7 @@ def test_clustering():
 def test_calculate_final_index():
     ndr = NDRindex([], [])
     clusters = ndr.clustering(data)
-    final_index = ndr.calculate_final_index(data, clusters)
+    final_index = ndr.calculate_NDRindex(data, clusters)
     assert final_index >= 0  # the final index should be a positive number
 
 
