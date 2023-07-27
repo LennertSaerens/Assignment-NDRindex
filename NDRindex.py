@@ -32,6 +32,7 @@ class NDRindex:
                 clusters.append([points.pop()])  # pop a point and create a cluster with it
             else:
                 for cluster in clusters:
+                    print(f"Currently looking at cluster {cluster}")
                     if not points:  # if there are no points left, break the loop
                         break
                     cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
@@ -40,6 +41,7 @@ class NDRindex:
                     if distances[closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
                         cluster.append(points.pop(closest_point_index))
                     else:  # if the closest point is not close enough, create a new cluster with it
+                        print(f"Creating new cluster because {distances[closest_point_index]} > {average_scale}")
                         clusters.append([points.pop(closest_point_index)])
         return clusters
 
@@ -63,7 +65,7 @@ class NDRindex:
             for dimension_reduction_method in self.dimension_reduction_methods:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
                 final_index_sum = 0
-                for i in range(num_runs):  # run the algorithm 100 times with different starting points
+                for i in range(num_runs):  # run the algorithm num_runs times with different starting points
                     print(f"Executing iteration {i} for normalization: {normalization_method} ; dim red: {dimension_reduction_method}")
                     clusters = self.clustering(reduced_data)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index

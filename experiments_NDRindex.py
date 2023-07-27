@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from NDRindex import NDRindex
 
 
-def generate_data(n_samples=10_000, n_features=2, n_clusters=3, cluster_std=0.5, center_box=(-10.0, 10.0)):
+def generate_data(n_samples=1_00, n_features=2, n_clusters=3, cluster_std=0.5, center_box=(-10.0, 10.0)):
     # Generate a synthetic dataset with n_samples samples, n_features features, and n_clusters clusters
     data, _ = make_blobs(n_samples=n_samples, n_features=n_features, centers=n_clusters, cluster_std=cluster_std,
                          center_box=center_box)
@@ -26,7 +26,7 @@ def run_experiment():
     ndr = NDRindex(normalization_methods, dimension_reduction_methods)
 
     # Evaluate the data quality
-    best_methods, best_score = ndr.evaluate_data_quality(data, 10)
+    best_methods, best_score = ndr.evaluate_data_quality(data, 1)
     print(f"Best methods: {best_methods}")
     print(f"Best score (NDRindex): {best_score}")
 
