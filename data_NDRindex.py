@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from NDRindex import NDRindex
 
 # Set the seed for reproducibility
 np.random.seed(0)
@@ -16,6 +17,7 @@ square_sizes = [4, 2, 1]
 hexagram_sizes = [4, 2, 1]
 galaxy_radii = [4, 2, 1]
 
+
 def generate_normal_clusters(stdev):
     datasets = []
     for center in centers:
@@ -24,6 +26,7 @@ def generate_normal_clusters(stdev):
         datasets.append(np.column_stack((x, y)))
     return np.concatenate(datasets)
 
+
 def generate_square_clusters(side_length):
     datasets = []
     for center in centers:
@@ -31,6 +34,7 @@ def generate_square_clusters(side_length):
         y = np.random.uniform(center[1] - side_length / 2, center[1] + side_length / 2, num_points)
         datasets.append(np.column_stack((x, y)))
     return np.concatenate(datasets)
+
 
 def generate_hexagram_clusters(size):
     datasets = []
@@ -44,6 +48,7 @@ def generate_hexagram_clusters(size):
         datasets.append(np.concatenate(points))
     return np.concatenate(datasets)
 
+
 def generate_galaxy_clusters(radius):
     datasets = []
     for center in centers:
@@ -53,6 +58,7 @@ def generate_galaxy_clusters(radius):
         y = center[1] + distances * np.sin(angles)
         datasets.append(np.column_stack((x, y)))
     return np.concatenate(datasets)
+
 
 # Generate the datasets
 normal_datasets = [generate_normal_clusters(stdev) for stdev in normal_stdevs]
@@ -69,22 +75,68 @@ for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_dataset
         axes[i, j].set_xlim(-10, 10)
         axes[i, j].set_ylim(-10, 10)
 
+# Define normalization and dimension reduction methods
+normalization_methods = [lambda x: x]  # No normalization
+dimension_reduction_methods = [lambda x: x]  # No dimension reduction
+
+# Initialize NDRindex
+ndr = NDRindex(normalization_methods, dimension_reduction_methods)
+
+
+# Function to calculate NDRindex for a list of datasets
+def calculate_ndr_indices(datasets):
+    indices = []
+    for data in datasets:
+        clusters = ndr.clustering(data)
+        index = ndr.calculate_NDRindex(data, clusters)
+        indices.append(index)
+    return indices
+
+
+# Calculate NDRindices for all datasets
+normal_ndr_indices = calculate_ndr_indices(normal_datasets)
+square_ndr_indices = calculate_ndr_indices(square_datasets)
+hexagram_ndr_indices = calculate_ndr_indices(hexagram_datasets)
+galaxy_ndr_indices = calculate_ndr_indices(galaxy_datasets)
+
+# Create a new figure with multiple subplots
+fig, axes = plt.subplots(4, 4, figsize=(20, 20))
+
+for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_datasets, galaxy_datasets]):
+    for j, data in enumerate(datasets):
+        axes[i, j].scatter(data[:, 0], data[:, 1], s=10)
+        axes[i, j].set_xlim(-10, 10)
+        axes[i, j].set_ylim(-10, 10)
+
+# Define the x-axis labels
+x = ['large', 'medium', 'small']
+
+# Plot the NDRindex on the 4th column for each type of dataset
+axes[0, 3].plot(x, normal_ndr_indices, marker='o')
+axes[1, 3].plot(x, square_ndr_indices, marker='o')
+axes[2, 3].plot(x, hexagram_ndr_indices, marker='o')
+axes[3, 3].plot(x, galaxy_ndr_indices, marker='o')
+
+# Set the labels and titles
 axes[0, 0].set_title("Normal, large spread")
 axes[0, 1].set_title("Normal, medium spread")
 axes[0, 2].set_title("Normal, small spread")
+axes[0, 3].set_title("Normal, NDRindex")
 
 axes[1, 0].set_title("Square, large size")
 axes[1, 1].set_title("Square, medium size")
 axes[1, 2].set_title("Square, small size")
+axes[1, 3].set_title("Square, NDRindex")
 
 axes[2, 0].set_title("Hexagram, large size")
 axes[2, 1].set_title("Hexagram, medium size")
 axes[2, 2].set_title("Hexagram, small size")
+axes[2, 3].set_title("Hexagram, NDRindex")
 
 axes[3, 0].set_title("Galaxy, large radius")
 axes[3, 1].set_title("Galaxy, medium radius")
 axes[3, 2].set_title("Galaxy, small radius")
+axes[3, 3].set_title("Galaxy, NDRindex")
 
 plt.tight_layout()
 plt.show()
-
