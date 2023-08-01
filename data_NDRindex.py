@@ -1,69 +1,90 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define the centers of the four clusters
-centers = np.array([[1, 1], [1, -1], [-1, -1], [-1, 1]])
+# Set the seed for reproducibility
+np.random.seed(0)
 
-# Define the standard deviations for the three variations
-std_devs = [0.5, 0.25, 0.1]
+# Number of points in each cluster
+num_points = 500
 
-# Define the number of points per cluster
-num_points = 100
+# Center points for each quadrant
+centers = [(5, 5), (-5, 5), (-5, -5), (5, -5)]
 
-# Initialize a dictionary to store the datasets
-datasets = {}
+# Parameters for each variant
+normal_stdevs = [2, 1, 0.5]
+square_sizes = [4, 2, 1]
+hexagram_sizes = [4, 2, 1]
+galaxy_radii = [4, 2, 1]
 
-# For each shape
-for shape in ['normal', 'square', 'hexagram', 'random']:
-    datasets[shape] = []
-    # For each standard deviation
-    for std_dev in std_devs:
-        # Initialize an array to store the data
-        data = np.empty((0, 2))
-        # For each center
-        for center in centers:
-            if shape == 'normal':
-                # Generate normally distributed data
-                cluster_data = np.random.normal(loc=center, scale=std_dev, size=(num_points, 2))
-            elif shape == 'square':
-                # Generate uniformly distributed data in a square
-                cluster_data = np.random.uniform(low=center-std_dev, high=center+std_dev, size=(num_points, 2))
-            elif shape == 'hexagram':
-                # Generate data in a hexagonal distribution
-                angles = np.random.uniform(0, 2*np.pi, num_points)
-                radii = std_dev * np.sqrt(np.random.uniform(0, 1, num_points))
-                x = radii * np.cos(angles) + center[0]
-                y = radii * np.sin(angles) + center[1]
-                cluster_data = np.stack((x, y), axis=-1)
-            elif shape == 'random':
-                # Generate random data
-                cluster_data = np.random.random((num_points, 2)) * 2 * std_dev + center - std_dev
-            # Append the cluster data to the data array
-            data = np.append(data, cluster_data, axis=0)
-        # Append the data array to the list of datasets for the current shape
-        datasets[shape].append(data)
+def generate_normal_clusters(stdev):
+    datasets = []
+    for center in centers:
+        x = np.random.normal(center[0], stdev, num_points)
+        y = np.random.normal(center[1], stdev, num_points)
+        datasets.append(np.column_stack((x, y)))
+    return np.concatenate(datasets)
 
-# Now you can access the datasets like this:
-normal_datasets = datasets['normal']
-square_datasets = datasets['square']
-hexagram_datasets = datasets['hexagram']
-random_datasets = datasets['random']
+def generate_square_clusters(side_length):
+    datasets = []
+    for center in centers:
+        x = np.random.uniform(center[0] - side_length / 2, center[0] + side_length / 2, num_points)
+        y = np.random.uniform(center[1] - side_length / 2, center[1] + side_length / 2, num_points)
+        datasets.append(np.column_stack((x, y)))
+    return np.concatenate(datasets)
 
-# Define the kind of datasets you want to visualize
-kind = 'random'
+def generate_hexagram_clusters(size):
+    datasets = []
+    for center in centers:
+        angles = np.linspace(0, 2 * np.pi, 6, endpoint=False)
+        points = []
+        for angle in angles:
+            x = center[0] + size * np.cos(angle) + np.random.normal(0, size * 0.1, num_points // 6)
+            y = center[1] + size * np.sin(angle) + np.random.normal(0, size * 0.1, num_points // 6)
+            points.append(np.column_stack((x, y)))
+        datasets.append(np.concatenate(points))
+    return np.concatenate(datasets)
 
-# Get the datasets for the specified kind
-datasets_for_kind = datasets[kind]
+def generate_galaxy_clusters(radius):
+    datasets = []
+    for center in centers:
+        angles = np.random.uniform(0, 2 * np.pi, num_points)
+        distances = radius * np.sqrt(np.random.uniform(0, 1, num_points))
+        x = center[0] + distances * np.cos(angles)
+        y = center[1] + distances * np.sin(angles)
+        datasets.append(np.column_stack((x, y)))
+    return np.concatenate(datasets)
 
-# Create a figure and axes
-fig, axs = plt.subplots(1, len(datasets_for_kind), figsize=(15, 5))
+# Generate the datasets
+normal_datasets = [generate_normal_clusters(stdev) for stdev in normal_stdevs]
+square_datasets = [generate_square_clusters(size) for size in square_sizes]
+hexagram_datasets = [generate_hexagram_clusters(size) for size in hexagram_sizes]
+galaxy_datasets = [generate_galaxy_clusters(radius) for radius in galaxy_radii]
 
-# For each dataset
-for i, data in enumerate(datasets_for_kind):
-    # Plot the dataset
-    axs[i].scatter(data[:, 0], data[:, 1])
-    axs[i].set_title(f'Standard Deviation: {std_devs[i]}')
+# Visualize the datasets
+fig, axes = plt.subplots(4, 3, figsize=(15, 20))
 
-# Display the figure
+for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_datasets, galaxy_datasets]):
+    for j, data in enumerate(datasets):
+        axes[i, j].scatter(data[:, 0], data[:, 1], s=10)
+        axes[i, j].set_xlim(-10, 10)
+        axes[i, j].set_ylim(-10, 10)
+
+axes[0, 0].set_title("Normal, large spread")
+axes[0, 1].set_title("Normal, medium spread")
+axes[0, 2].set_title("Normal, small spread")
+
+axes[1, 0].set_title("Square, large size")
+axes[1, 1].set_title("Square, medium size")
+axes[1, 2].set_title("Square, small size")
+
+axes[2, 0].set_title("Hexagram, large size")
+axes[2, 1].set_title("Hexagram, medium size")
+axes[2, 2].set_title("Hexagram, small size")
+
+axes[3, 0].set_title("Galaxy, large radius")
+axes[3, 1].set_title("Galaxy, medium radius")
+axes[3, 2].set_title("Galaxy, small radius")
+
+plt.tight_layout()
 plt.show()
 
