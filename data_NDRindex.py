@@ -5,6 +5,17 @@ from NDRindex import NDRindex
 # Set the seed for reproducibility
 np.random.seed(0)
 
+
+# Function to calculate NDRindex for a list of datasets
+def calculate_ndr_indices(datasets):
+    indices = []
+    for data in datasets:
+        clusters = ndr.clustering(data)
+        index = ndr.calculate_NDRindex(data, clusters)
+        indices.append(index)
+    return indices
+
+
 # Number of points in each cluster
 num_points = 500
 
@@ -66,8 +77,8 @@ square_datasets = [generate_square_clusters(size) for size in square_sizes]
 hexagram_datasets = [generate_hexagram_clusters(size) for size in hexagram_sizes]
 galaxy_datasets = [generate_galaxy_clusters(radius) for radius in galaxy_radii]
 
-# Visualize the datasets
-fig, axes = plt.subplots(4, 3, figsize=(15, 20))
+# Create a new figure with multiple subplots
+fig, axes = plt.subplots(4, 4, figsize=(20, 20))
 
 for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_datasets, galaxy_datasets]):
     for j, data in enumerate(datasets):
@@ -82,25 +93,11 @@ dimension_reduction_methods = [lambda x: x]  # No dimension reduction
 # Initialize NDRindex
 ndr = NDRindex(normalization_methods, dimension_reduction_methods)
 
-
-# Function to calculate NDRindex for a list of datasets
-def calculate_ndr_indices(datasets):
-    indices = []
-    for data in datasets:
-        clusters = ndr.clustering(data)
-        index = ndr.calculate_NDRindex(data, clusters)
-        indices.append(index)
-    return indices
-
-
 # Calculate NDRindices for all datasets
 normal_ndr_indices = calculate_ndr_indices(normal_datasets)
 square_ndr_indices = calculate_ndr_indices(square_datasets)
 hexagram_ndr_indices = calculate_ndr_indices(hexagram_datasets)
 galaxy_ndr_indices = calculate_ndr_indices(galaxy_datasets)
-
-# Create a new figure with multiple subplots
-fig, axes = plt.subplots(4, 4, figsize=(20, 20))
 
 for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_datasets, galaxy_datasets]):
     for j, data in enumerate(datasets):
