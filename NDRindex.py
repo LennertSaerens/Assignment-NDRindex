@@ -22,9 +22,9 @@ class NDRindex:
         average_scale = M / np.log10(n)
         return average_scale
 
-    def clustering(self, data):
+    def clustering(self, data, average_scale):
         # Perform clustering and find the point gathering areas
-        average_scale = self.calculate_average_scale(data)
+        # average_scale = self.calculate_average_scale(data)
         clusters = []
         points = list(range(data.shape[0]))  # list of point indices
         np.random.shuffle(points)  # randomize the order of points
@@ -69,9 +69,10 @@ class NDRindex:
             normalized_data = normalization_method(data)  # apply normalization
             for dimension_reduction_method in self.dimension_reduction_methods:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
+                average_scale = self.calculate_average_scale(reduced_data)
                 final_index_sum = 0
                 for i in range(num_runs):  # run the algorithm num_runs times with different starting points
-                    clusters = self.clustering(reduced_data)  # perform clustering
+                    clusters = self.clustering(reduced_data, average_scale)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index
                     final_index_sum += final_index
                     pbar.update(1)  # Update the progress bar

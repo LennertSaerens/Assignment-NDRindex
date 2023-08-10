@@ -10,7 +10,8 @@ np.random.seed(0)
 def calculate_ndr_indices(datasets):
     indices = []
     for data in datasets:
-        clusters = ndr.clustering(data)
+        average_scale = ndr.calculate_average_scale(data)
+        clusters = ndr.clustering(data, average_scale)
         index = ndr.calculate_NDRindex(data, clusters)
         indices.append(index)
     return indices
