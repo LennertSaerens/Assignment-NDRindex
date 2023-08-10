@@ -24,7 +24,6 @@ class NDRindex:
 
     def clustering(self, data, average_scale):
         # Perform clustering and find the point gathering areas
-        # average_scale = self.calculate_average_scale(data)
         clusters = []
         points = list(range(data.shape[0]))  # list of point indices
         np.random.shuffle(points)  # randomize the order of points
