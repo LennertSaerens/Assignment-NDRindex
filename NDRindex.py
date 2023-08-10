@@ -1,11 +1,13 @@
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+from tqdm import tqdm
 
 
 class NDRindex:
-    def __init__(self, normalization_methods, dimension_reduction_methods):
+    def __init__(self, normalization_methods, dimension_reduction_methods, verbose=False):
         self.normalization_methods = normalization_methods
         self.dimension_reduction_methods = dimension_reduction_methods
+        self.verbose = verbose
 
     def calculate_distance_matrix(self, data):
         # Calculate the distance matrix
@@ -60,18 +62,23 @@ class NDRindex:
         # Evaluate the data qualities
         best_score = -np.inf
         best_methods = None
+        total_iterations = len(self.normalization_methods) * len(self.dimension_reduction_methods) * num_runs
+        pbar = tqdm(total=total_iterations, disable=not self.verbose, desc="Processing", ncols=100)  # Initialize tqdm progress bar
+
         for normalization_method in self.normalization_methods:
             normalized_data = normalization_method(data)  # apply normalization
             for dimension_reduction_method in self.dimension_reduction_methods:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
                 final_index_sum = 0
                 for i in range(num_runs):  # run the algorithm num_runs times with different starting points
-                    print(f"Executing iteration {i} for normalization: {normalization_method} ; dim red: {dimension_reduction_method}")
                     clusters = self.clustering(reduced_data)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index
                     final_index_sum += final_index
+                    pbar.update(1)  # Update the progress bar
                 final_index_avg = final_index_sum / num_runs  # average final index over the total number of runs
                 if final_index_avg > best_score:  # if the average final index is higher than the current best score, update the best score and best methods
                     best_score = final_index_avg
                     best_methods = (normalization_method, dimension_reduction_method)
+
+        pbar.close()  # Close the tqdm progress bar
         return best_methods, best_score
