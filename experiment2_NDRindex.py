@@ -2,6 +2,8 @@ from rpy2 import robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 from NDRindex import NDRindex
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 # Import the RCSL package
 rcsl = importr('RCSL')
@@ -16,13 +18,26 @@ yan_df = pandas2ri.rpy2py(yan_dataset)
 # Convert the pandas DataFrame to a NumPy array
 yan_array = yan_df.values
 
+
+# Define PCA function
+def pca_reduction(data, n_components=2):
+    pca = PCA(n_components=n_components)
+    return pca.fit_transform(data)
+
+
+# Define t-SNE function
+def tsne_reduction(data, n_components=2):
+    tsne = TSNE(n_components=n_components)
+    return tsne.fit_transform(data)
+
+
 # Define normalization and dimension reduction methods
 normalization_methods = [lambda x: x]  # No normalization
-dimension_reduction_methods = [lambda x: x]  # No dimension reduction
+dimension_reduction_methods = [pca_reduction, tsne_reduction]
 
 # Initialize NDRindex
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Evaluate the data quality using the yan_array
-best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=10)
+best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=3)
 print(f"Best score: {best_score}; Best methods: {best_methods}")
