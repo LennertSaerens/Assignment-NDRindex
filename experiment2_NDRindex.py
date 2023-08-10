@@ -21,8 +21,8 @@ normalization_methods = [lambda x: x]  # No normalization
 dimension_reduction_methods = [lambda x: x]  # No dimension reduction
 
 # Initialize NDRindex
-ndr = NDRindex(normalization_methods, dimension_reduction_methods)
+ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Evaluate the data quality using the yan_array
-best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=1)
+best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=10)
 print(f"Best score: {best_score}; Best methods: {best_methods}")
