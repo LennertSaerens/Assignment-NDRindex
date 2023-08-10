@@ -30,14 +30,18 @@ def test_calculate_average_scale():
 
 def test_clustering():
     ndr = NDRindex([], [])
-    clusters = ndr.clustering(data)
+    distance_matrix = ndr.calculate_distance_matrix(data)
+    avg_scale = ndr.calculate_average_scale(distance_matrix)
+    clusters = ndr.clustering(data, avg_scale)
     assert len(clusters) > 0  # there should be at least one cluster
     assert sum(len(cluster) for cluster in clusters) == 10  # all points should belong to a cluster
 
 
 def test_calculate_final_index():
     ndr = NDRindex([], [])
-    clusters = ndr.clustering(data)
+    distance_matrix = ndr.calculate_distance_matrix(data)
+    avg_scale = ndr.calculate_average_scale(distance_matrix)
+    clusters = ndr.clustering(data, avg_scale)
     final_index = ndr.calculate_NDRindex(data, clusters)
     assert final_index >= 0  # the final index should be a positive number
 
