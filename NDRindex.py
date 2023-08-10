@@ -25,25 +25,34 @@ class NDRindex:
     def clustering(self, data, average_scale):
         # Perform clustering and find the point gathering areas
         clusters = []
+        cluster_centers = []  # cache for cluster centers
         points = list(range(data.shape[0]))  # list of point indices
         np.random.shuffle(points)  # randomize the order of points
 
         while points:
             if not clusters:  # if there are no clusters, create the first one
-                clusters.append([points.pop()])  # pop a point and create a cluster with it
+                point = points.pop()
+                clusters.append([point])  # pop a point and create a cluster with it
+                cluster_centers.append(data[point])  # add the point itself as the center
             else:
-                cluster = clusters[-1] # the cluster we are trying to expand by one point
+                cluster = clusters[-1]  # the cluster we are trying to expand by one point
+                cluster_center = cluster_centers[-1]  # get the last cluster center
                 if not points:  # if there are no points left, break the loop
                     break
-                cluster_center = np.mean(data[cluster], axis=0)  # geometric center of the cluster
-                distances = np.linalg.norm(data[points] - cluster_center, axis=1)  # distances from the center to all remaining points
+                distances = np.linalg.norm(data[points] - cluster_center,
+                                           axis=1)  # distances from the center to all remaining points
                 closest_point_index = np.argmin(distances)  # index of the closest point
-                if distances[closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
-                    # print(f"Adding a new point to cluster {cluster} because {distances[closest_point_index]} < {average_scale}")
-                    cluster.append(points.pop(closest_point_index))
+                if distances[
+                    closest_point_index] < average_scale:  # if the closest point is close enough, add it to the cluster
+                    closest_point = points.pop(closest_point_index)
+                    cluster.append(closest_point)
+                    # Update the cluster center incrementally
+                    cluster_center = (cluster_center * len(cluster) + data[closest_point]) / (len(cluster) + 1)
+                    cluster_centers[-1] = cluster_center
                 else:  # if the closest point is not close enough, create a new cluster with it
-                    # print(f"Creating new cluster because {distances[closest_point_index]} > {average_scale}")
-                    clusters.append([points.pop(closest_point_index)])
+                    closest_point = points.pop(closest_point_index)
+                    clusters.append([closest_point])
+                    cluster_centers.append(data[closest_point])  # add the new point as the center of the new cluster
         return clusters
 
     def calculate_NDRindex(self, data, clusters):
