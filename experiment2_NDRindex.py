@@ -5,6 +5,7 @@ from NDRindex import NDRindex
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.manifold import MDS
+from sklearn.preprocessing import StandardScaler
 
 # Import the RCSL package
 rcsl = importr('RCSL')
@@ -18,6 +19,12 @@ yan_df = pandas2ri.rpy2py(yan_dataset)
 
 # Convert the pandas DataFrame to a NumPy array
 yan_array = yan_df.values
+
+
+# Scale Normalization
+def scale_normalization(data):
+    scaler = StandardScaler()
+    return scaler.fit_transform(data)
 
 
 # Define PCA function
@@ -40,7 +47,7 @@ def sammon_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [lambda x: x]  # No normalization
+normalization_methods = [scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex
