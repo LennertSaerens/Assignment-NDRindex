@@ -4,6 +4,7 @@ from rpy2.robjects import pandas2ri
 from NDRindex import NDRindex
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.manifold import MDS
 
 # Import the RCSL package
 rcsl = importr('RCSL')
@@ -31,13 +32,20 @@ def tsne_reduction(data, n_components=2):
     return tsne.fit_transform(data)
 
 
+# Define the Sammon Function
+def sammon_reduction(data, n_components=2):
+    # Approximate Sammon's mapping by setting the dissimilarity parameter to 'euclidean'
+    mds = MDS(n_components=n_components, dissimilarity='euclidean', random_state=42)
+    return mds.fit_transform(data)
+
+
 # Define normalization and dimension reduction methods
 normalization_methods = [lambda x: x]  # No normalization
-dimension_reduction_methods = [pca_reduction, tsne_reduction]
+dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Evaluate the data quality using the yan_array
-best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=3)
+best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=100)
 print(f"Best score: {best_score}; Best methods: {best_methods}")
