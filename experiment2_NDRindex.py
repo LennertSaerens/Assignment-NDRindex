@@ -54,5 +54,5 @@ dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Evaluate the data quality using the yan_array
-best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=100)
+best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=3)
 print(f"Best score: {best_score}; Best methods: {best_methods}")
