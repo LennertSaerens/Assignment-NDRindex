@@ -8,12 +8,11 @@ from sklearn.manifold import TSNE
 from sklearn.manifold import MDS
 from sklearn.preprocessing import StandardScaler
 
-# Import the RCSL package
+# Import necessary R packages
 rcsl = importr('RCSL')
-# Import the edgeR package
 edgeR = importr('edgeR')
-# Import the Linnorm package
 Linnorm = importr('Linnorm')
+scran = importr('scran')
 
 # Access the 'yan' dataset
 yan_dataset = robjects.r['yan']
@@ -36,6 +35,13 @@ def tmm_normalization(data):
 # Linnorm Normalization
 def linnorm_normalization(data):
     return np.array(Linnorm.Linnorm(data))
+
+
+# Scran Normalization
+def scran_normalization(data):
+    # Assuming data is a matrix of counts
+    size_factors = scran.computeSumFactors(data)
+    return np.array(size_factors * data / np.sum(data, axis=1))
 
 
 # Scale Normalization
@@ -64,7 +70,7 @@ def sammon_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
+normalization_methods = [scran_normalization, linnorm_normalization, tmm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex
