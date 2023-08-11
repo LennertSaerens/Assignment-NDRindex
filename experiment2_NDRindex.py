@@ -1,3 +1,4 @@
+import numpy as np
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
@@ -9,6 +10,8 @@ from sklearn.preprocessing import StandardScaler
 
 # Import the RCSL package
 rcsl = importr('RCSL')
+# Import the edgeR package
+edgeR = importr('edgeR')
 
 # Access the 'yan' dataset
 yan_dataset = robjects.r['yan']
@@ -19,6 +22,13 @@ yan_df = pandas2ri.rpy2py(yan_dataset)
 
 # Convert the pandas DataFrame to a NumPy array
 yan_array = yan_df.values
+
+
+# TMM (Trimmed Mean of M-values) Normalization
+def tmm_normalization(data):
+    dge_object = edgeR.DGEList(counts=data)
+    dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
+    return np.array(edgeR.cpm(dge_tmm, log=True))
 
 
 # Scale Normalization
@@ -47,7 +57,7 @@ def sammon_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [scale_normalization]
+normalization_methods = [tmm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex

@@ -79,6 +79,7 @@ class NDRindex:
                 reduced_data = dimension_reduction_method(normalized_data)  # apply dimensionality reduction
                 average_scale = self.calculate_average_scale(reduced_data)
                 final_index_sum = 0
+                print(f"Currently using normalization method: {normalization_method} and dimensionality reduction: {dimension_reduction_method}")
                 for i in range(num_runs):  # run the algorithm num_runs times with different starting points
                     clusters = self.clustering(reduced_data, average_scale)  # perform clustering
                     final_index = self.calculate_NDRindex(reduced_data, clusters)  # calculate final index
