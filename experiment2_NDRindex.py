@@ -12,6 +12,8 @@ from sklearn.preprocessing import StandardScaler
 rcsl = importr('RCSL')
 # Import the edgeR package
 edgeR = importr('edgeR')
+# Import the Linnorm package
+Linnorm = importr('Linnorm')
 
 # Access the 'yan' dataset
 yan_dataset = robjects.r['yan']
@@ -29,6 +31,11 @@ def tmm_normalization(data):
     dge_object = edgeR.DGEList(counts=data)
     dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
     return np.array(edgeR.cpm(dge_tmm, log=True))
+
+
+# Linnorm Normalization
+def linnorm_normalization(data):
+    return np.array(Linnorm.Linnorm(data))
 
 
 # Scale Normalization
@@ -57,7 +64,7 @@ def sammon_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [tmm_normalization, scale_normalization]
+normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex
