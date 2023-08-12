@@ -5,14 +5,15 @@ from rpy2.robjects import pandas2ri
 from NDRindex import NDRindex
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from sklearn.manifold import MDS
 from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.metrics import adjusted_rand_score
 
 # Import necessary R packages
 rcsl = importr('RCSL')
 edgeR = importr('edgeR')
 Linnorm = importr('Linnorm')
-scran = importr('scran')
 
 # Access the 'yan' dataset
 yan_dataset = robjects.r['yan']
@@ -55,20 +56,46 @@ def tsne_reduction(data, n_components=2):
     return tsne.fit_transform(data)
 
 
-# Define the Sammon Function
-def sammon_reduction(data, n_components=2):
-    # Approximate Sammon's mapping by setting the dissimilarity parameter to 'euclidean'
-    mds = MDS(n_components=n_components, dissimilarity='euclidean', random_state=42)
-    return mds.fit_transform(data)
-
-
 # Define normalization and dimension reduction methods
 normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
-dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
+dimension_reduction_methods = [pca_reduction, tsne_reduction]
 
 # Initialize NDRindex
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Evaluate the data quality using the yan_array
-best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=3)
-print(f"Best score: {best_score}; Best methods: {best_methods}")
+# best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=10)
+# print(f"Best score: {best_score}; Best methods: {best_methods}")
+
+# Output of running the NDRindex algorithm:
+# Best score: 0.8828749538618043; Best methods: (<function scale_normalization at 0x139f98ae0>, <function pca_reduction at 0x139f98cc0>)
+# Results show that the best combination of normalization and dimensionality reduction methods for the "yan" dataset
+# is the scale normalization method along with PCA for dimensionality reduction.
+
+# BENCHMARKING THE RESULT WITH ARI
+
+# Load the 'yan' and 'ann' datasets from R
+yan_dataset = robjects.r['yan']
+ann_dataset = robjects.r['ann']
+
+# Convert to appropriate data structures
+expression_matrix = np.array(yan_dataset)  # Gene expression matrix
+true_labels = np.array(ann_dataset)  # Cell type labels
+
+# Flatten true_labels if it's a 2D array
+if true_labels.ndim == 2:
+    true_labels = true_labels.flatten()
+
+# Apply scale normalization
+normalized_data = scale_normalization(expression_matrix)
+
+# Apply PCA for dimensionality reduction
+reduced_data = pca_reduction(normalized_data)
+
+# Apply k-means clustering (set number of clusters based on unique cell types)
+kmeans = KMeans(n_clusters=len(np.unique(true_labels)), n_init=10)
+kmeans_labels = kmeans.fit_predict(reduced_data)
+
+# Compute ARI for k-means
+kmeans_ari = adjusted_rand_score(true_labels, kmeans_labels)
+print(f"ARI for k-means clustering: {kmeans_ari}")
