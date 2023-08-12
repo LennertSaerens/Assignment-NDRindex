@@ -4,6 +4,10 @@ from rpy2.robjects.packages import importr
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
+from rpy2.robjects import r
+from rpy2.robjects import numpy2ri
+
+numpy2ri.activate()  # Activate the NumPy to R conversion
 
 # Import necessary R packages
 rcsl = importr('RCSL')
@@ -27,12 +31,16 @@ if true_labels.ndim == 2:
 def tmm_normalization(data):
     dge_object = edgeR.DGEList(counts=data)
     dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
-    return np.array(edgeR.cpm(dge_tmm, log=True))
+    result = np.array(edgeR.cpm(dge_tmm, log=True)).T
+    return result
 
 
 # Linnorm Normalization
 def linnorm_normalization(data):
-    return np.array(Linnorm.Linnorm(data))
+    data_array = np.array(data)  # Convert DataFrame to NumPy array
+    transposed_data = data_array.T  # Transpose the NumPy array
+    result = np.array(Linnorm.Linnorm(transposed_data)).T
+    return result
 
 
 # Scale Normalization
