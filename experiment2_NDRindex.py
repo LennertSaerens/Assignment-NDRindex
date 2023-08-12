@@ -1,69 +1,16 @@
 import numpy as np
-from rpy2 import robjects
-from rpy2.robjects.packages import importr
-from rpy2.robjects import pandas2ri
-from NDRindex import NDRindex
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 
-# Import necessary R packages
-rcsl = importr('RCSL')
-edgeR = importr('edgeR')
-Linnorm = importr('Linnorm')
+from NDRindex import NDRindex
+from experimentsSetup_NDRindex import yan_dataset, ann_dataset, normalization_methods, dimension_reduction_methods, \
+    scale_normalization, pca_reduction
 
-# Access the 'yan' dataset
-yan_dataset = robjects.r['yan']
-
-# Convert the R data frame to a pandas DataFrame
-pandas2ri.activate()
-yan_df = pandas2ri.rpy2py(yan_dataset)
-
-# Convert the pandas DataFrame to a NumPy array
-yan_array = yan_df.values
-
-
-# TMM (Trimmed Mean of M-values) Normalization
-def tmm_normalization(data):
-    dge_object = edgeR.DGEList(counts=data)
-    dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
-    return np.array(edgeR.cpm(dge_tmm, log=True))
-
-
-# Linnorm Normalization
-def linnorm_normalization(data):
-    return np.array(Linnorm.Linnorm(data))
-
-
-# Scale Normalization
-def scale_normalization(data):
-    scaler = StandardScaler()
-    return scaler.fit_transform(data)
-
-
-# Define PCA function
-def pca_reduction(data, n_components=2):
-    pca = PCA(n_components=n_components)
-    return pca.fit_transform(data)
-
-
-# Define t-SNE function
-def tsne_reduction(data, n_components=2):
-    tsne = TSNE(n_components=n_components)
-    return tsne.fit_transform(data)
-
-
-# Define normalization and dimension reduction methods
-normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
-dimension_reduction_methods = [pca_reduction, tsne_reduction]
-
-# Initialize NDRindex
+# Initialize NDRindex algorithm
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
-# Evaluate the data quality using the yan_array
-# best_methods, best_score = ndr.evaluate_data_quality(yan_array, num_runs=10)
+# Find the best preprocessing path for the Yan dataset according to the NDRindex algorithm
+# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=10)
 # print(f"Best score: {best_score}; Best methods: {best_methods}")
 
 # Output of running the NDRindex algorithm:
@@ -72,10 +19,6 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 # is the scale normalization method along with PCA for dimensionality reduction.
 
 # BENCHMARKING THE RESULT WITH ARI
-
-# Load the 'yan' and 'ann' datasets from R
-yan_dataset = robjects.r['yan']
-ann_dataset = robjects.r['ann']
 
 # Convert to appropriate data structures
 expression_matrix = np.array(yan_dataset)  # Gene expression matrix
