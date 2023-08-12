@@ -7,7 +7,6 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-from scipy.cluster.hierarchy import linkage, fcluster
 from sklearn.metrics import adjusted_rand_score
 
 # Import necessary R packages
