@@ -37,13 +37,6 @@ def linnorm_normalization(data):
     return np.array(Linnorm.Linnorm(data))
 
 
-# Scran Normalization
-def scran_normalization(data):
-    # Assuming data is a matrix of counts
-    size_factors = scran.computeSumFactors(data)
-    return np.array(size_factors * data / np.sum(data, axis=1))
-
-
 # Scale Normalization
 def scale_normalization(data):
     scaler = StandardScaler()
@@ -70,7 +63,7 @@ def sammon_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [scran_normalization, linnorm_normalization, tmm_normalization, scale_normalization]
+normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction, sammon_reduction]
 
 # Initialize NDRindex
