@@ -20,34 +20,28 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # BENCHMARKING THE RESULT WITH ARI
 
-# Apply scale normalization
-normalized_data = linnorm_normalization(yan_dataset)
-# Apply PCA for dimensionality reduction
-reduced_data = pca_reduction(normalized_data)
-
-# Apply k-means clustering (set number of clusters based on unique cell types)
+# # Apply scale normalization
+# normalized_data = linnorm_normalization(yan_dataset)
+# # Apply PCA for dimensionality reduction
+# reduced_data = pca_reduction(normalized_data)
+#
+# # Apply k-means clustering (set number of clusters based on unique cell types)
 kmeans = KMeans(n_clusters=len(np.unique(true_labels)), n_init=10)
-kmeans_labels = kmeans.fit_predict(reduced_data)
-
-print(true_labels.shape)
-print(kmeans_labels.shape)
-
-# Compute ARI for k-means
-kmeans_ari = adjusted_rand_score(true_labels, kmeans_labels)
-print(f"ARI for k-means clustering: {kmeans_ari}")
-
-
-# def run_experiment(dataset, ground_truth):
-#     for normalization_method in normalization_methods:
-#         print("poep")
-#         normalized_data = normalization_method(dataset)
-#         print("hier")
-#         for dimension_reduction_method in dimension_reduction_methods:
-#             reduced_data = dimension_reduction_method(normalized_data)
-#             print("daar")
-#             clustering_labels = kmeans.fit_predict(reduced_data)
-#             ari = adjusted_rand_score(ground_truth, clustering_labels)
-#             print(f"ARI for {normalization_method.__name__} and {dimension_reduction_method.__name__}: {ari}")
+# kmeans_labels = kmeans.fit_predict(reduced_data)
 #
-#
-# run_experiment(yan_dataset, true_labels)
+# # Compute ARI for k-means
+# kmeans_ari = adjusted_rand_score(true_labels, kmeans_labels)
+# print(f"ARI for k-means clustering: {kmeans_ari}")
+
+
+def run_experiment(dataset, ground_truth, clustering_method):
+    for normalization_method in normalization_methods:
+        normalized_data = normalization_method(dataset)
+        for dimension_reduction_method in dimension_reduction_methods:
+            reduced_data = dimension_reduction_method(normalized_data)
+            clustering_labels = clustering_method(reduced_data)
+            ari = adjusted_rand_score(ground_truth, clustering_labels)
+            print(f"ARI for {normalization_method.__name__} and {dimension_reduction_method.__name__}: {ari}")
+
+
+run_experiment(yan_dataset, true_labels, kmeans.fit_predict)
