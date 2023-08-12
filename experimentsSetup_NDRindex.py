@@ -1,13 +1,9 @@
 import numpy as np
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
-from rpy2.robjects import pandas2ri
-from NDRindex import NDRindex
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.metrics import adjusted_rand_score
 
 # Import necessary R packages
 rcsl = importr('RCSL')
@@ -17,6 +13,14 @@ Linnorm = importr('Linnorm')
 # Load the 'yan' and 'ann' datasets from R
 yan_dataset = robjects.r['yan']
 ann_dataset = robjects.r['ann']
+
+# Convert to appropriate data structures
+expression_matrix = np.array(yan_dataset)  # Gene expression matrix
+true_labels = np.array(ann_dataset)  # Cell type labels
+
+# Flatten true_labels if it's a 2D array
+if true_labels.ndim == 2:
+    true_labels = true_labels.flatten()
 
 
 # TMM (Trimmed Mean of M-values) Normalization

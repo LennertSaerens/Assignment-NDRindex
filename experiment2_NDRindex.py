@@ -1,16 +1,16 @@
 import numpy as np
-from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.cluster import KMeans
 
 from NDRindex import NDRindex
-from experimentsSetup_NDRindex import yan_dataset, ann_dataset, normalization_methods, dimension_reduction_methods, \
-    scale_normalization, pca_reduction
+from experimentsSetup_NDRindex import *
 
 # Initialize NDRindex algorithm
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Find the best preprocessing path for the Yan dataset according to the NDRindex algorithm
-# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=10)
+# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=1)
 # print(f"Best score: {best_score}; Best methods: {best_methods}")
 
 # Output of running the NDRindex algorithm:
@@ -20,17 +20,8 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # BENCHMARKING THE RESULT WITH ARI
 
-# Convert to appropriate data structures
-expression_matrix = np.array(yan_dataset)  # Gene expression matrix
-true_labels = np.array(ann_dataset)  # Cell type labels
-
-# Flatten true_labels if it's a 2D array
-if true_labels.ndim == 2:
-    true_labels = true_labels.flatten()
-
 # Apply scale normalization
-normalized_data = scale_normalization(expression_matrix)
-
+normalized_data = linnorm_normalization(yan_dataset)
 # Apply PCA for dimensionality reduction
 reduced_data = pca_reduction(normalized_data)
 
@@ -38,6 +29,25 @@ reduced_data = pca_reduction(normalized_data)
 kmeans = KMeans(n_clusters=len(np.unique(true_labels)), n_init=10)
 kmeans_labels = kmeans.fit_predict(reduced_data)
 
+print(true_labels.shape)
+print(kmeans_labels.shape)
+
 # Compute ARI for k-means
 kmeans_ari = adjusted_rand_score(true_labels, kmeans_labels)
 print(f"ARI for k-means clustering: {kmeans_ari}")
+
+
+# def run_experiment(dataset, ground_truth):
+#     for normalization_method in normalization_methods:
+#         print("poep")
+#         normalized_data = normalization_method(dataset)
+#         print("hier")
+#         for dimension_reduction_method in dimension_reduction_methods:
+#             reduced_data = dimension_reduction_method(normalized_data)
+#             print("daar")
+#             clustering_labels = kmeans.fit_predict(reduced_data)
+#             ari = adjusted_rand_score(ground_truth, clustering_labels)
+#             print(f"ARI for {normalization_method.__name__} and {dimension_reduction_method.__name__}: {ari}")
+#
+#
+# run_experiment(yan_dataset, true_labels)
