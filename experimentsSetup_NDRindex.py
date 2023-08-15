@@ -1,11 +1,10 @@
 import numpy as np
 from rpy2 import robjects
+from rpy2.robjects import numpy2ri
 from rpy2.robjects.packages import importr
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
-from rpy2.robjects import r
-from rpy2.robjects import numpy2ri
 
 numpy2ri.activate()  # Activate the NumPy to R conversion
 
@@ -35,7 +34,9 @@ biase_true_labels = np.array(cell_type_biase)  # Cell type labels
 # Flatten true_labels if it's a 2D array
 if yan_true_labels.ndim == 2:
     true_labels = yan_true_labels.flatten()
-
+# Flatten true_labels if it's a 2D array
+if biase_true_labels.ndim == 2:
+    true_labels = biase_true_labels.flatten()
 
 # TMM (Trimmed Mean of M-values) Normalization
 def tmm_normalization(data):
