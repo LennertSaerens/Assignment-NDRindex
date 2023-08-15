@@ -13,18 +13,28 @@ numpy2ri.activate()  # Activate the NumPy to R conversion
 rcsl = importr('RCSL')
 edgeR = importr('edgeR')
 Linnorm = importr('Linnorm')
+SparseMDC = importr('SparseMDC')
 
 # Load the 'yan' and 'ann' datasets from R
 yan_dataset = robjects.r['yan']
 ann_dataset = robjects.r['ann']
 
+# Load the Biase datasets from R
+data_biase = robjects.r['data_biase']
+cell_type_biase = robjects.r['cell_type_biase']
+
 # Convert to appropriate data structures
-expression_matrix = np.array(yan_dataset)  # Gene expression matrix
-true_labels = np.array(ann_dataset)  # Cell type labels
+yan_expression_matrix = np.array(yan_dataset)  # Gene expression matrix
+yan_true_labels = np.array(ann_dataset)  # Cell type labels
+biase_expression_matrix = np.array(data_biase).T  # Gene expression matrix, transpose to be same format as Yan
+biase_true_labels = np.array(cell_type_biase)  # Cell type labels
+
+# print(f"Yan dataset shape: {yan_expression_matrix.shape}")
+# print(f"Biase dataset shape: {biase_expression_matrix.shape}")
 
 # Flatten true_labels if it's a 2D array
-if true_labels.ndim == 2:
-    true_labels = true_labels.flatten()
+if yan_true_labels.ndim == 2:
+    true_labels = yan_true_labels.flatten()
 
 
 # TMM (Trimmed Mean of M-values) Normalization
