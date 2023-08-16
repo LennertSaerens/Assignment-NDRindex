@@ -45,7 +45,7 @@ deng_expression_matrix = np.array(deng_expression_matrix_R).T
 deng_metadata = robjects.r['colData'](deng_dataset)
 # Extract 'group' labels directly using R functions
 deng_labels_R = robjects.r['$'](deng_metadata, 'group')
-deng_labels = np.array(deng_labels_R).flatten()
+deng_true_labels = np.array(deng_labels_R).flatten()
 
 # print(f"Yan dataset shape: {yan_expression_matrix.shape}")
 # print(f"Biase dataset shape: {biase_expression_matrix.shape}")
