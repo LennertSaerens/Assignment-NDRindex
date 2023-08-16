@@ -1,13 +1,11 @@
 import numpy as np
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
+from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
-import pandas as pd
-from rpy2.robjects import pandas2ri
-
 
 numpy2ri.activate()  # Activate the NumPy to R conversion
 pandas2ri.activate()  # Activate the Pandas to R conversion
@@ -32,24 +30,30 @@ yan_true_labels = np.array(ann_dataset).flatten()  # Cell type labels
 biase_expression_matrix = np.array(data_biase).T  # Gene expression matrix, transpose to be same format as Yan
 biase_true_labels = np.array(cell_type_biase).flatten()  # Cell type labels
 
-print(type(yan_dataset))
-print(type(data_biase))
-print(type(yan_expression_matrix))
-print(type(biase_expression_matrix))
+# print(type(yan_dataset))
+# print(type(data_biase))
+# print(type(yan_expression_matrix))
+# print(type(biase_expression_matrix))
+#
+# print(f"Yan dataset shape: {yan_expression_matrix.shape}")
+# print(f"Biase dataset shape: {biase_expression_matrix.shape}")
+# print(f"Yan true labels shape: {yan_true_labels.shape}")
+# print(f"Biase true labels shape: {biase_true_labels.shape}")
 
-print(f"Yan dataset shape: {yan_expression_matrix.shape}")
-print(f"Biase dataset shape: {biase_expression_matrix.shape}")
-print(f"Yan true labels shape: {yan_true_labels.shape}")
-print(f"Biase true labels shape: {biase_true_labels.shape}")
 
-
-# TMM (Trimmed Mean of M-values) Normalization
-def tmm_normalization(data):
-    data = pd.DataFrame(data)
-    data = pandas2ri.py2rpy(data)
-    dge_object = edgeR.DGEList(counts=data)
+def tmm_normalization(data_np):
+    # Remove rows with all zeros
+    data_np = data_np[~np.all(data_np == 0, axis=1)]
+    # Remove columns (samples) with sum of zero
+    data_np = data_np[:, np.sum(data_np, axis=0) != 0]
+    # Convert numpy array to R matrix
+    data_r = numpy2ri.py2rpy(data_np)
+    # Create a DGEList object
+    dge_object = edgeR.DGEList(counts=data_r)
+    # Perform TMM normalization
     dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
-    result = np.array(edgeR.cpm(dge_tmm, log=True)).T
+    # Convert normalized data to logCPM
+    result = edgeR.cpm(dge_tmm, log=True)
     return result
 
 
@@ -79,5 +83,17 @@ def tsne_reduction(data, n_components=2):
 
 
 # Define normalization and dimension reduction methods
-normalization_methods = [linnorm_normalization, tmm_normalization, scale_normalization]
+normalization_methods = [tmm_normalization, linnorm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction]
+
+
+# def test(data):
+#     for normalization_method in normalization_methods:
+#         normalized_data = normalization_method(data)
+#         for dimension_reduction_method in dimension_reduction_methods:
+#             print(f"Testing combination of {normalization_method.__name__} and {dimension_reduction_method.__name__}")
+#             reduced_data = dimension_reduction_method(normalized_data)
+#             print(f"Shape of reduced data: {reduced_data.shape}")
+#
+#
+# test(biase_expression_matrix)
