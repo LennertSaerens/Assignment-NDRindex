@@ -79,6 +79,20 @@ clustering_algorithms = {
     }
 }
 
+results = {}  # Store results for each dataset and clustering algorithm
+datasets = {
+    "yan": yan_expression_matrix,
+    "biase": biase_expression_matrix,
+    "deng": deng_expression_matrix,
+    "usoskin": usoskin_expression_matrix
+}
+ground_truths = {
+    "yan": yan_true_labels,
+    "biase": biase_true_labels,
+    "deng": deng_true_labels,
+    "usoskin": usoskin_true_labels
+}
+
 
 def run_experiment(dataset, ground_truth, clustering_method):
     print(f"Running experiment with clustering method: {clustering_method.__name__} ...")
