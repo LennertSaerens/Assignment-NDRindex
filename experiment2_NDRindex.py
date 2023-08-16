@@ -44,7 +44,7 @@ def run_experiment(dataset, ground_truth, clustering_method):
         normalized_data = normalization_method(dataset)
         for dimension_reduction_method in dimension_reduction_methods:
             reduced_data = dimension_reduction_method(normalized_data)
-            print(f"Shape of reduced data: {reduced_data.shape}")  # Add this line
+            # print(f"Shape of reduced data: {reduced_data.shape}")  # Add this line
             clustering_labels = clustering_method(reduced_data)
             ari = adjusted_rand_score(ground_truth, clustering_labels)
             ari_scores.append(ari)
