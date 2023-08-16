@@ -1,5 +1,8 @@
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import adjusted_rand_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
 from experimentsSetup_NDRindex import *
 
@@ -50,3 +53,28 @@ ari_results = {}
 for dataset_name, (data, labels) in datasets.items():
     avg_ari, aris = compute_ARI_with_best_methods(data, labels, best_methods_map[dataset_name])
     ari_results[dataset_name] = (avg_ari, aris)
+
+# VISUALIZATION
+
+# Convert ARI results into long form DataFrame
+ari_df = pd.DataFrame({
+    'Dataset': [dataset for dataset in ari_results.keys() for _ in range(len(ari_results[dataset][1]))],
+    'ARI': [ari for scores in ari_results.values() for ari in scores[1]]
+})
+
+# Plot using Seaborn
+plt.figure(figsize=(12, 8))
+
+# Use barplot to display the average ARI scores as rectangles
+sns.barplot(data=ari_df, x='Dataset', y='ARI', ci=None, color='lightblue', estimator=np.mean)
+
+# Use stripplot to show individual ARI scores as dots
+sns.stripplot(data=ari_df, x='Dataset', y='ARI', jitter=True, marker='o', alpha=0.7, color='black')
+
+plt.title('Distribution of ARI scores for different datasets using NDRindex')
+plt.ylabel('Adjusted Rand Index (ARI)')
+plt.xlabel('Dataset')
+plt.tight_layout()
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.show()
+
