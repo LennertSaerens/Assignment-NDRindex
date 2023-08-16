@@ -214,6 +214,10 @@ for idx, (clustering_name, _) in enumerate(clustering_algorithms.items()):
     autolabel(rects3, ax)
     autolabel(rects4, ax)
 
+    # Remove x-axis ticks and labels
+    ax.set_xticks([])
+    ax.set_xticklabels([])
+
     # Add x- and y-axis labels only to the border subplots for clarity
     if idx in [0, 1]:
         ax.set_xticks([])
