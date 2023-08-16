@@ -9,8 +9,10 @@ from experimentsSetup_NDRindex import *
 # Initialize NDRindex algorithm
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
+# ----------------------------------------------------------------------------------------------
+
 # Find the best preprocessing path for the Yan dataset according to the NDRindex algorithm
-# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=1)
+# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=100)
 # print(f"Best score: {best_score}; Best methods: {best_methods}")
 
 # Output of running the NDRindex algorithm:
@@ -18,9 +20,10 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 # Results show that the best combination of normalization and dimensionality reduction methods for the "Yan" dataset
 # is the scale normalization method along with PCA for dimensionality reduction.
 
+# ----------------------------------------------------------------------------------------------
 
 # Find the best preprocessing path for the Biase dataset according to the NDRindex algorithm
-# best_methods, best_score = ndr.evaluate_data_quality(biase_expression_matrix, num_runs=30)
+# best_methods, best_score = ndr.evaluate_data_quality(biase_expression_matrix, num_runs=100)
 # print(f"Best score: {best_score}; Best methods: {best_methods}")
 
 # Output of running the NDRindex algorithm:
@@ -28,11 +31,37 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 # Results show that the best combination of normalization and dimensionality reduction methods for the "Biase" dataset
 # is the linnorm normalization method along with PCA for dimensionality reduction.
 
+# ----------------------------------------------------------------------------------------------
+
+# Find the best preprocessing path for the Deng dataset according to the NDRindex algorithm
+# best_methods, best_score = ndr.evaluate_data_quality(deng_expression_matrix, num_runs=100)
+# print(f"Best score: {best_score}; Best methods: {best_methods}")
+
+# Output of running the NDRindex algorithm:
+# Best score: 0.7462070825358466; Best methods: (<function linnorm_normalization at 0x152bcad40>, <function pca_reduction at 0x152bcae80>)
+# Results show that the best combination of normalization and dimensionality reduction methods for the "Deng" dataset
+# is the linnorm normalization method along with PCA for dimensionality reduction.
+
+# ----------------------------------------------------------------------------------------------
+
+# Find the best preprocessing path for the Usoskin dataset according to the NDRindex algorithm
+# best_methods, best_score = ndr.evaluate_data_quality(usoskin_expression_matrix, num_runs=1000)
+# print(f"Best score: {best_score}; Best methods: {best_methods}")
+
+# Output of running the NDRindex algorithm:
+# Best score: 0.7050653804288648; Best methods: (<function linnorm_normalization at 0x14d8f0b80>, <function tsne_reduction at 0x14d8f0c20>)
+# Results show that the best combination of normalization and dimensionality reduction methods for the "Usoskin" dataset
+# is the linnorm normalization method along with TSNE for dimensionality reduction.
+
+# ----------------------------------------------------------------------------------------------
+
 # BENCHMARKING THE RESULT WITH ARI
 
 # Initialize K-Means clustering algorithm
 kmeans_yan = KMeans(n_clusters=len(np.unique(yan_true_labels)), n_init=10)
 kmeans_biase = KMeans(n_clusters=len(np.unique(biase_true_labels)), n_init=10)
+kmeans_deng = KMeans(n_clusters=len(np.unique(deng_true_labels)), n_init=10)
+kmeans_usoskin = KMeans(n_clusters=len(np.unique(usoskin_true_labels)), n_init=10)
 
 
 def run_experiment(dataset, ground_truth, clustering_method):
@@ -57,6 +86,9 @@ def run_experiment(dataset, ground_truth, clustering_method):
 ari_scores_yan, method_combinations_yan = run_experiment(yan_expression_matrix, yan_true_labels, kmeans_yan.fit_predict)
 ari_scores_biase, method_combinations_biase = run_experiment(biase_expression_matrix, biase_true_labels,
                                                              kmeans_biase.fit_predict)
+ari_scores_deng, method_combinations_deng = run_experiment(deng_expression_matrix, deng_true_labels,
+                                                           kmeans_deng.fit_predict)
+ari_scores_usoskin, method_combinations_usoskin = run_experiment(usoskin_expression_matrix, usoskin_true_labels, kmeans_usoskin.fit_predict)
 
 
 def calculate_metrics(ari_scores, method_combinations, best_normalization_method, best_dimension_reduction_method):
@@ -70,6 +102,8 @@ def calculate_metrics(ari_scores, method_combinations, best_normalization_method
 
 values_yan = calculate_metrics(ari_scores_yan, method_combinations_yan, 'scale_normalization', 'pca_reduction')
 values_biase = calculate_metrics(ari_scores_biase, method_combinations_biase, 'linnorm_normalization', 'pca_reduction')
+values_deng = calculate_metrics(ari_scores_deng, method_combinations_deng, 'linnorm_normalization', 'pca_reduction')
+values_usoskin = calculate_metrics(ari_scores_usoskin, method_combinations_usoskin, 'linnorm_normalization', 'tsne_reduction')
 
 # VISUALIZATION
 
@@ -84,25 +118,35 @@ fig, ax = plt.subplots()
 # Adjust positions for yan bars
 start_yan = 0
 end_yan = num_metrics
-yan_positions = np.linspace(start_yan, end_yan - 1, num_metrics)
-rects1 = ax.bar(yan_positions, values_yan, width, label='Yan', color=colors)
+positions_yan = np.linspace(start_yan, end_yan - 1, num_metrics)
+rects1 = ax.bar(positions_yan, values_yan, width, label='Yan', color=colors)
 
 # Adjust positions for biase bars
 start_biase = end_yan + 1
 end_biase = start_biase + num_metrics
-biase_positions = np.linspace(start_biase, end_biase - 1, num_metrics)
-rects2 = ax.bar(biase_positions, values_biase, width, label='Biase', color=colors)
+positions_biase = np.linspace(start_biase, end_biase - 1, num_metrics)
+rects2 = ax.bar(positions_biase, values_biase, width, label='Biase', color=colors)
 
-# Add some text for labels, title, and custom x-axis tick labels, etc.
-ax.set_ylabel('ARI Score')
-ax.set_title('K-Means')
-ax.set_xticks(list(yan_positions) + list(biase_positions))
-ax.set_xticks([])
+# Adjust positions for deng bars
+start_deng = end_biase + 1
+end_deng = start_deng + num_metrics
+positions_deng = np.linspace(start_deng, end_deng - 1, num_metrics)
+rects3 = ax.bar(positions_deng, values_deng, width, label='Deng', color=colors)
+
+# Adjust positions for usoskin bars
+start_usoskin = end_deng + 1
+end_usoskin = start_usoskin + num_metrics
+positions_usoskin = np.linspace(start_usoskin, end_usoskin - 1, num_metrics)
+rects4 = ax.bar(positions_usoskin, values_usoskin, width, label='Usoskin', color=colors)
+
+# Define position for dataset names below the sets of bars
+dataset_name_y_position = -max(values_yan + values_biase + values_deng) * 0.05  # 5% below the x-axis for clarity
 
 # Adding dataset names below the sets of bars
-dataset_name_y_position = -max(values_yan + values_biase) * 0.05  # 5% below the x-axis for clarity
-ax.text(np.mean(yan_positions), dataset_name_y_position, 'Yan', ha='center', va='center')
-ax.text(np.mean(biase_positions), dataset_name_y_position, 'Biase', ha='center', va='center')
+ax.text(np.mean(positions_yan), dataset_name_y_position, 'Yan', ha='center', va='center')
+ax.text(np.mean(positions_biase), dataset_name_y_position, 'Biase', ha='center', va='center')
+ax.text(np.mean(positions_deng), dataset_name_y_position, 'Deng', ha='center', va='center')
+ax.text(np.mean(positions_usoskin), dataset_name_y_position, 'Usoskin', ha='center', va='center')
 
 # Add legend for colors
 legend_elements = [Line2D([0], [0], color=color, lw=4, label=label) for color, label in zip(colors, labels)]
@@ -122,7 +166,8 @@ def autolabel(rects):
 
 autolabel(rects1)
 autolabel(rects2)
+autolabel(rects3)
+autolabel(rects4)
 
 fig.tight_layout()
-plt.xticks(rotation=45)
 plt.show()

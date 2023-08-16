@@ -29,6 +29,9 @@ cell_type_biase = robjects.r['cell_type_biase']
 # Load the Deng datasets from R
 deng_dataset = robjects.r['deng']
 
+# Load the Usoskin datasets from R
+usoskin_dataset = robjects.r['usoskin']
+
 # Convert to appropriate data structures
 # YAN
 yan_expression_matrix = np.array(yan_dataset)  # Gene expression matrix
@@ -47,12 +50,23 @@ deng_metadata = robjects.r['colData'](deng_dataset)
 deng_labels_R = robjects.r['$'](deng_metadata, 'group')
 deng_true_labels = np.array(deng_labels_R).flatten()
 
+# USOSKIN
+usoskin_expression_matrix_R = robjects.r['assay'](usoskin_dataset)
+usoskin_expression_matrix = np.array(usoskin_expression_matrix_R).T
+# Access the colData slot of the Usoskin dataset
+usoskin_metadata = robjects.r['colData'](usoskin_dataset)
+# Extract 'Level.1' labels directly using R functions
+usoskin_labels_R = robjects.r['$'](usoskin_metadata, 'Level.1')
+usoskin_true_labels = np.array(usoskin_labels_R).flatten()
+
 # print(f"Yan dataset shape: {yan_expression_matrix.shape}")
 # print(f"Biase dataset shape: {biase_expression_matrix.shape}")
 # print(f"Deng dataset shape: {deng_expression_matrix.shape}")
+# print(f"Usoskin dataset shape: {usoskin_expression_matrix.shape}")
 # print(f"Yan true labels shape: {yan_true_labels.shape}")
 # print(f"Biase true labels shape: {biase_true_labels.shape}")
-# print(f"Deng true labels shape: {deng_labels.shape}")
+# print(f"Deng true labels shape: {deng_true_labels.shape}")
+# print(f"Usoskin true labels shape: {usoskin_true_labels.shape}")
 
 
 def tmm_normalization(data_np):
@@ -110,4 +124,4 @@ dimension_reduction_methods = [pca_reduction, tsne_reduction]
 #             print(f"Shape of reduced data: {reduced_data.shape}")
 #
 #
-# test(deng_expression_matrix)
+# test(usoskin_expression_matrix)
