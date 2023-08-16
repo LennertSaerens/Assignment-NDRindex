@@ -5,8 +5,12 @@ from rpy2.robjects.packages import importr
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
+import pandas as pd
+from rpy2.robjects import pandas2ri
+
 
 numpy2ri.activate()  # Activate the NumPy to R conversion
+pandas2ri.activate()  # Activate the Pandas to R conversion
 
 # Import necessary R packages
 rcsl = importr('RCSL')
@@ -24,22 +28,25 @@ cell_type_biase = robjects.r['cell_type_biase']
 
 # Convert to appropriate data structures
 yan_expression_matrix = np.array(yan_dataset)  # Gene expression matrix
-yan_true_labels = np.array(ann_dataset)  # Cell type labels
+yan_true_labels = np.array(ann_dataset).flatten()  # Cell type labels
 biase_expression_matrix = np.array(data_biase).T  # Gene expression matrix, transpose to be same format as Yan
-biase_true_labels = np.array(cell_type_biase)  # Cell type labels
+biase_true_labels = np.array(cell_type_biase).flatten()  # Cell type labels
 
-# print(f"Yan dataset shape: {yan_expression_matrix.shape}")
-# print(f"Biase dataset shape: {biase_expression_matrix.shape}")
+print(type(yan_dataset))
+print(type(data_biase))
+print(type(yan_expression_matrix))
+print(type(biase_expression_matrix))
 
-# Flatten true_labels if it's a 2D array
-if yan_true_labels.ndim == 2:
-    true_labels = yan_true_labels.flatten()
-# Flatten true_labels if it's a 2D array
-if biase_true_labels.ndim == 2:
-    true_labels = biase_true_labels.flatten()
+print(f"Yan dataset shape: {yan_expression_matrix.shape}")
+print(f"Biase dataset shape: {biase_expression_matrix.shape}")
+print(f"Yan true labels shape: {yan_true_labels.shape}")
+print(f"Biase true labels shape: {biase_true_labels.shape}")
+
 
 # TMM (Trimmed Mean of M-values) Normalization
 def tmm_normalization(data):
+    data = pd.DataFrame(data)
+    data = pandas2ri.py2rpy(data)
     dge_object = edgeR.DGEList(counts=data)
     dge_tmm = edgeR.calcNormFactors(dge_object, method="TMM")
     result = np.array(edgeR.cpm(dge_tmm, log=True)).T
@@ -48,8 +55,7 @@ def tmm_normalization(data):
 
 # Linnorm Normalization
 def linnorm_normalization(data):
-    data_array = np.array(data)  # Convert DataFrame to NumPy array
-    transposed_data = data_array.T  # Transpose the NumPy array
+    transposed_data = data.T  # Transpose the NumPy array
     result = np.array(Linnorm.Linnorm(transposed_data)).T
     return result
 
