@@ -1,6 +1,7 @@
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 from NDRindex import NDRindex
 from experimentsSetup_NDRindex import *
@@ -9,7 +10,7 @@ from experimentsSetup_NDRindex import *
 ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # Find the best preprocessing path for the Yan dataset according to the NDRindex algorithm
-# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=100)
+# best_methods, best_score = ndr.evaluate_data_quality(yan_dataset, num_runs=1)
 # print(f"Best score: {best_score}; Best methods: {best_methods}")
 
 # Output of running the NDRindex algorithm:
@@ -65,7 +66,7 @@ def run_experiment(dataset, ground_truth, clustering_method):
     return ari_scores, method_combinations
 
 
-# ari_scores_yan, method_combinations_yan = run_experiment(yan_expression_matrix, yan_true_labels, kmeans_yan.fit_predict)
+ari_scores_yan, method_combinations_yan = run_experiment(yan_expression_matrix, yan_true_labels, kmeans_yan.fit_predict)
 ari_scores_biase, method_combinations_biase = run_experiment(biase_expression_matrix, biase_true_labels,
                                                              kmeans_biase.fit_predict)
 
@@ -82,6 +83,9 @@ def calculate_metrics(ari_scores, method_combinations, best_normalization_method
 values_yan = calculate_metrics(ari_scores_yan, method_combinations_yan, 'scale_normalization', 'pca_reduction')
 values_biase = calculate_metrics(ari_scores_biase, method_combinations_biase, 'linnorm_normalization', 'pca_reduction')
 
+# VISUALIZATION
+
+colors = ['red', 'green', 'blue', 'purple', 'cyan']  # List of colors for bars
 labels = ['Chosen ARI', 'Average ARI', 'Median ARI', 'Upper Quartile ARI', 'Max ARI']
 num_metrics = len(labels)
 x = np.arange(num_metrics)  # the label locations
@@ -93,20 +97,28 @@ fig, ax = plt.subplots()
 start_yan = 0
 end_yan = num_metrics
 yan_positions = np.linspace(start_yan, end_yan - 1, num_metrics)
-rects1 = ax.bar(yan_positions, values_yan, width, label='Yan', color='blue')
+rects1 = ax.bar(yan_positions, values_yan, width, label='Yan', color=colors)
 
 # Adjust positions for biase bars
 start_biase = end_yan + 1
 end_biase = start_biase + num_metrics
 biase_positions = np.linspace(start_biase, end_biase - 1, num_metrics)
-rects2 = ax.bar(biase_positions, values_biase, width, label='Biase', color='orange')
+rects2 = ax.bar(biase_positions, values_biase, width, label='Biase', color=colors)
 
-# Add some text for labels, title and custom x-axis tick labels, etc.
+# Add some text for labels, title, and custom x-axis tick labels, etc.
 ax.set_ylabel('ARI Score')
-ax.set_title('Comparison of ARI Metrics for Yan and Biase datasets')
+ax.set_title('K-Means')
 ax.set_xticks(list(yan_positions) + list(biase_positions))
-ax.set_xticklabels(labels * 2)
-ax.legend()
+ax.set_xticks([])
+
+# Adding dataset names below the sets of bars
+dataset_name_y_position = -max(values_yan + values_biase) * 0.05  # 5% below the x-axis for clarity
+ax.text(np.mean(yan_positions), dataset_name_y_position, 'Yan', ha='center', va='center')
+ax.text(np.mean(biase_positions), dataset_name_y_position, 'Biase', ha='center', va='center')
+
+# Add legend for colors
+legend_elements = [Line2D([0], [0], color=color, lw=4, label=label) for color, label in zip(colors, labels)]
+ax.legend(handles=legend_elements, loc='upper left')
 
 
 # Autolabel function to display the label on top of bars
