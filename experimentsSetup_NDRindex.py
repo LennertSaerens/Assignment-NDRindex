@@ -15,6 +15,8 @@ rcsl = importr('RCSL')
 edgeR = importr('edgeR')
 Linnorm = importr('Linnorm')
 SparseMDC = importr('SparseMDC')
+SingleCellExperiment = importr('SingleCellExperiment')
+scDatasets = importr('scDatasets')
 
 # Load the 'yan' and 'ann' datasets from R
 yan_dataset = robjects.r['yan']
@@ -24,21 +26,33 @@ ann_dataset = robjects.r['ann']
 data_biase = robjects.r['data_biase']
 cell_type_biase = robjects.r['cell_type_biase']
 
+# Load the Deng datasets from R
+deng_dataset = robjects.r['deng']
+
 # Convert to appropriate data structures
+# YAN
 yan_expression_matrix = np.array(yan_dataset)  # Gene expression matrix
 yan_true_labels = np.array(ann_dataset).flatten()  # Cell type labels
+
+# BIASE
 biase_expression_matrix = np.array(data_biase).T  # Gene expression matrix, transpose to be same format as Yan
 biase_true_labels = np.array(cell_type_biase).flatten()  # Cell type labels
 
-# print(type(yan_dataset))
-# print(type(data_biase))
-# print(type(yan_expression_matrix))
-# print(type(biase_expression_matrix))
-#
+# DENG
+deng_expression_matrix_R = robjects.r['assay'](deng_dataset)
+deng_expression_matrix = np.array(deng_expression_matrix_R).T
+# Access the colData slot of the Deng dataset
+deng_metadata = robjects.r['colData'](deng_dataset)
+# Extract 'group' labels directly using R functions
+deng_labels_R = robjects.r['$'](deng_metadata, 'group')
+deng_labels = np.array(deng_labels_R).flatten()
+
 # print(f"Yan dataset shape: {yan_expression_matrix.shape}")
 # print(f"Biase dataset shape: {biase_expression_matrix.shape}")
+# print(f"Deng dataset shape: {deng_expression_matrix.shape}")
 # print(f"Yan true labels shape: {yan_true_labels.shape}")
 # print(f"Biase true labels shape: {biase_true_labels.shape}")
+# print(f"Deng true labels shape: {deng_labels.shape}")
 
 
 def tmm_normalization(data_np):
@@ -96,4 +110,4 @@ dimension_reduction_methods = [pca_reduction, tsne_reduction]
 #             print(f"Shape of reduced data: {reduced_data.shape}")
 #
 #
-# test(biase_expression_matrix)
+# test(deng_expression_matrix)
