@@ -2,6 +2,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering, AffinityPropagation
 from sklearn.metrics import adjusted_rand_score
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+import hdbscan
 
 from NDRindex import NDRindex
 from experimentsSetup_NDRindex import *
@@ -76,6 +77,12 @@ clustering_algorithms = {
         "biase": AffinityPropagation(),
         "deng": AffinityPropagation(),
         "usoskin": AffinityPropagation()
+    },
+    "hdbscan": {
+        "yan": hdbscan.HDBSCAN(min_cluster_size=5, gen_min_span_tree=True),
+        "biase": hdbscan.HDBSCAN(min_cluster_size=5, gen_min_span_tree=True),
+        "deng": hdbscan.HDBSCAN(min_cluster_size=5, gen_min_span_tree=True),
+        "usoskin": hdbscan.HDBSCAN(min_cluster_size=5, gen_min_span_tree=True)
     }
 }
 
