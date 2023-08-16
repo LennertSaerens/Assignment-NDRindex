@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, AgglomerativeClustering, AffinityPropagation
 from sklearn.metrics import adjusted_rand_score
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -57,15 +57,31 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # BENCHMARKING THE RESULT WITH ARI
 
-# Initialize K-Means clustering algorithm
-kmeans_yan = KMeans(n_clusters=len(np.unique(yan_true_labels)), n_init=10)
-kmeans_biase = KMeans(n_clusters=len(np.unique(biase_true_labels)), n_init=10)
-kmeans_deng = KMeans(n_clusters=len(np.unique(deng_true_labels)), n_init=10)
-kmeans_usoskin = KMeans(n_clusters=len(np.unique(usoskin_true_labels)), n_init=10)
+# Initialize all clustering algorithms
+clustering_algorithms = {
+    "kmeans": {
+        "yan": KMeans(n_clusters=len(np.unique(yan_true_labels)), n_init=10),
+        "biase": KMeans(n_clusters=len(np.unique(biase_true_labels)), n_init=10),
+        "deng": KMeans(n_clusters=len(np.unique(deng_true_labels)), n_init=10),
+        "usoskin": KMeans(n_clusters=len(np.unique(usoskin_true_labels)), n_init=10)
+    },
+    "hclust": {
+        "yan": AgglomerativeClustering(n_clusters=len(np.unique(yan_true_labels))),
+        "biase": AgglomerativeClustering(n_clusters=len(np.unique(biase_true_labels))),
+        "deng": AgglomerativeClustering(n_clusters=len(np.unique(deng_true_labels))),
+        "usoskin": AgglomerativeClustering(n_clusters=len(np.unique(usoskin_true_labels)))
+    },
+    "ap_clust": {
+        "yan": AffinityPropagation(),
+        "biase": AffinityPropagation(),
+        "deng": AffinityPropagation(),
+        "usoskin": AffinityPropagation()
+    }
+}
 
 
 def run_experiment(dataset, ground_truth, clustering_method):
-    print("Running experiment...")
+    print(f"Running experiment with clustering method: {clustering_method.__name__} ...")
     ari_scores = []
     method_combinations = []
 
