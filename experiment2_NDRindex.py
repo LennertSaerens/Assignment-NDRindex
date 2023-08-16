@@ -30,21 +30,9 @@ ndr = NDRindex(normalization_methods, dimension_reduction_methods, verbose=True)
 
 # BENCHMARKING THE RESULT WITH ARI
 
-# # Apply scale normalization
-# normalized_data = linnorm_normalization(yan_dataset)
-# # Apply PCA for dimensionality reduction
-# reduced_data = pca_reduction(normalized_data)
-#
-# # Apply k-means clustering (set number of clusters based on unique cell types)
+# Initialize K-Means clustering algorithm
 kmeans_yan = KMeans(n_clusters=len(np.unique(yan_true_labels)), n_init=10)
 kmeans_biase = KMeans(n_clusters=len(np.unique(biase_true_labels)), n_init=10)
-
-
-# kmeans_labels = kmeans.fit_predict(reduced_data)
-#
-# # Compute ARI for k-means
-# kmeans_ari = adjusted_rand_score(true_labels, kmeans_labels)
-# print(f"ARI for k-means clustering: {kmeans_ari}")
 
 
 def run_experiment(dataset, ground_truth, clustering_method):
