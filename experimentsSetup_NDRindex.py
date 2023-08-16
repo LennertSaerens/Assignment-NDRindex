@@ -59,6 +59,7 @@ usoskin_metadata = robjects.r['colData'](usoskin_dataset)
 usoskin_labels_R = robjects.r['$'](usoskin_metadata, 'Level.1')
 usoskin_true_labels = np.array(usoskin_labels_R).flatten()
 
+
 # print(f"Yan dataset shape: {yan_expression_matrix.shape}")
 # print(f"Biase dataset shape: {biase_expression_matrix.shape}")
 # print(f"Deng dataset shape: {deng_expression_matrix.shape}")
@@ -113,7 +114,6 @@ def tsne_reduction(data, n_components=2):
 # Define normalization and dimension reduction methods
 normalization_methods = [tmm_normalization, linnorm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction]
-
 
 # def test(data):
 #     for normalization_method in normalization_methods:

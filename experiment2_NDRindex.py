@@ -141,78 +141,87 @@ best_methods_map = {
     "usoskin": ('linnorm_normalization', 'tsne_reduction')
 }
 for key, result in results.items():
-    dataset_name = key.replace(clustering_name + "_", "")  # Corrected line
+    dataset_name = key.split("_")[-1]
     best_methods = best_methods_map[dataset_name]
     values[key] = calculate_metrics(result["ari_scores"], result["method_combinations"], *best_methods)
 
-# values_yan = calculate_metrics(ari_scores_yan, method_combinations_yan, 'scale_normalization', 'pca_reduction')
-# values_biase = calculate_metrics(ari_scores_biase, method_combinations_biase, 'linnorm_normalization', 'pca_reduction')
-# values_deng = calculate_metrics(ari_scores_deng, method_combinations_deng, 'linnorm_normalization', 'pca_reduction')
-# values_usoskin = calculate_metrics(ari_scores_usoskin, method_combinations_usoskin, 'linnorm_normalization', 'tsne_reduction')
+# VISUALIZATION
 
-# # VISUALIZATION
-#
-# colors = ['red', 'green', 'blue', 'purple', 'cyan']  # List of colors for bars
-# labels = ['Chosen ARI', 'Average ARI', 'Median ARI', 'Upper Quartile ARI', 'Max ARI']
-# num_metrics = len(labels)
-# x = np.arange(num_metrics)  # the label locations
-# width = 0.7  # width of a bar
-#
-# fig, ax = plt.subplots()
-#
-# # Adjust positions for yan bars
-# start_yan = 0
-# end_yan = num_metrics
-# positions_yan = np.linspace(start_yan, end_yan - 1, num_metrics)
-# rects1 = ax.bar(positions_yan, values_yan, width, label='Yan', color=colors)
-#
-# # Adjust positions for biase bars
-# start_biase = end_yan + 1
-# end_biase = start_biase + num_metrics
-# positions_biase = np.linspace(start_biase, end_biase - 1, num_metrics)
-# rects2 = ax.bar(positions_biase, values_biase, width, label='Biase', color=colors)
-#
-# # Adjust positions for deng bars
-# start_deng = end_biase + 1
-# end_deng = start_deng + num_metrics
-# positions_deng = np.linspace(start_deng, end_deng - 1, num_metrics)
-# rects3 = ax.bar(positions_deng, values_deng, width, label='Deng', color=colors)
-#
-# # Adjust positions for usoskin bars
-# start_usoskin = end_deng + 1
-# end_usoskin = start_usoskin + num_metrics
-# positions_usoskin = np.linspace(start_usoskin, end_usoskin - 1, num_metrics)
-# rects4 = ax.bar(positions_usoskin, values_usoskin, width, label='Usoskin', color=colors)
-#
-# # Define position for dataset names below the sets of bars
-# dataset_name_y_position = -max(values_yan + values_biase + values_deng) * 0.05  # 5% below the x-axis for clarity
-#
-# # Adding dataset names below the sets of bars
-# ax.text(np.mean(positions_yan), dataset_name_y_position, 'Yan', ha='center', va='center')
-# ax.text(np.mean(positions_biase), dataset_name_y_position, 'Biase', ha='center', va='center')
-# ax.text(np.mean(positions_deng), dataset_name_y_position, 'Deng', ha='center', va='center')
-# ax.text(np.mean(positions_usoskin), dataset_name_y_position, 'Usoskin', ha='center', va='center')
-#
-# # Add legend for colors
-# legend_elements = [Line2D([0], [0], color=color, lw=4, label=label) for color, label in zip(colors, labels)]
-# ax.legend(handles=legend_elements, loc='upper left')
-#
-#
-# # Autolabel function to display the label on top of bars
-# def autolabel(rects):
-#     for rect in rects:
-#         height = rect.get_height()
-#         ax.annotate('{}'.format(round(height, 2)),
-#                     xy=(rect.get_x() + rect.get_width() / 2, height),
-#                     xytext=(0, 3),  # 3 points vertical offset
-#                     textcoords="offset points",
-#                     ha='center', va='bottom')
-#
-#
-# autolabel(rects1)
-# autolabel(rects2)
-# autolabel(rects3)
-# autolabel(rects4)
-#
-# fig.tight_layout()
-# plt.show()
+# Define the layout for the subplots
+num_clustering_algorithms = len(clustering_algorithms)
+fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(15, 10))  # Assuming you have 4 clustering algorithms
+
+# Flatten the axes for easy iteration
+axes = axes.ravel()
+
+colors = ['red', 'green', 'blue', 'purple', 'cyan']  # List of colors for bars
+labels = ['Chosen ARI', 'Average ARI', 'Median ARI', 'Upper Quartile ARI', 'Max ARI']
+num_metrics = len(labels)
+x = np.arange(num_metrics)  # the label locations
+width = 0.7  # width of a bar
+
+# Define positions for all datasets
+positions_yan = np.linspace(0, num_metrics - 1, num_metrics)
+positions_biase = positions_yan + num_metrics + 1
+positions_deng = positions_biase + num_metrics + 1
+positions_usoskin = positions_deng + num_metrics + 1
+
+dataset_name_y_position = -0.1  # Position below the x-axis for clarity
+
+
+# Autolabel function to display the label on top of bars
+def autolabel(rects, ax):
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(round(height, 2)),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+
+# Iterate over each clustering algorithm and plot in a respective subplot
+for idx, (clustering_name, _) in enumerate(clustering_algorithms.items()):
+    ax = axes[idx]
+    ax.set_title(clustering_name)
+
+    # Fetch results for this clustering algorithm
+    values_yan = values[f"{clustering_name}_yan"]
+    values_biase = values[f"{clustering_name}_biase"]
+    values_deng = values[f"{clustering_name}_deng"]
+    values_usoskin = values[f"{clustering_name}_usoskin"]
+
+    # Plot bars for each dataset
+    rects1 = ax.bar(positions_yan, values_yan, width, label='Yan', color=colors)
+    rects2 = ax.bar(positions_biase, values_biase, width, label='Biase', color=colors)
+    rects3 = ax.bar(positions_deng, values_deng, width, label='Deng', color=colors)
+    rects4 = ax.bar(positions_usoskin, values_usoskin, width, label='Usoskin', color=colors)
+
+    # Adding dataset names below the sets of bars
+    ax.text(np.mean(positions_yan), dataset_name_y_position, 'Yan', ha='center', va='center')
+    ax.text(np.mean(positions_biase), dataset_name_y_position, 'Biase', ha='center', va='center')
+    ax.text(np.mean(positions_deng), dataset_name_y_position, 'Deng', ha='center', va='center')
+    ax.text(np.mean(positions_usoskin), dataset_name_y_position, 'Usoskin', ha='center', va='center')
+
+    # Add legend for colors
+    if idx == 0:  # Add legend only to the first subplot for clarity
+        legend_elements = [Line2D([0], [0], color=color, lw=4, label=label) for color, label in zip(colors, labels)]
+        ax.legend(handles=legend_elements, loc='upper left')
+
+    # Label bars
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
+    autolabel(rects3, ax)
+    autolabel(rects4, ax)
+
+    # Add x- and y-axis labels only to the border subplots for clarity
+    if idx in [0, 1]:
+        ax.set_xticks([])
+    if idx % 2 == 0:
+        ax.set_ylabel('ARI Value')
+    else:
+        ax.set_yticklabels([])
+
+# Adjust layout for clarity
+fig.tight_layout()
+plt.show()
