@@ -25,40 +25,41 @@ yan_matrix_transposed <- t(yan_matrix)
 sce <- SingleCellExperiment(assays = list(counts = yan_matrix_transposed), 
                             rowData = DataFrame(feature_symbol = colnames(yan_matrix)))
 
-
 # Log transform the counts and store in logcounts assay
 logcounts(sce) <- log2(counts(sce) + 1)
 
 # Check assay names
 cat("Assay names in SingleCellExperiment: ", assayNames(sce), "\n")
 
-# Directly set the number of clusters based on unique labels in 'ann'
-k <- 6
-cat("Number of clusters (k) based on unique labels in 'ann':", k, "\n")
-
-# If yan dataset has row names, use them as gene names
-if (!is.null(rownames(yan))) {
-  rowData(sce)$feature_symbol <- rownames(yan)
-} else {
-  # Otherwise, use placeholder gene names
-  rowData(sce)$feature_symbol <- paste0("Gene_", seq_len(nrow(sce)))
-}
-
-# Set k in the SC3 metadata and proceed with the clustering
-metadata(sce)$sc3$k <- k
-sce <- sc3_prepare(sce)
-sce <- sc3_calc_dists(sce)
-sce <- sc3_calc_transfs(sce)
-sce <- sc3_kmeans(sce, ks = k)
-sce <- sc3_calc_consens(sce)
-
-# Get SC3 clusters
-clusters <- colData(sce)$sc3_6_clusters
-
-# Convert factor levels of ann to numeric format
+# Convert factor levels of ann to numeric format for ARI computation later
 true_labels <- as.numeric(as.factor(ann$cell_type1))
 
-# Now, compute the ARI
-ari_sc3 <- adjustedRandIndex(clusters, true_labels)
-print(ari_sc3)
+# Define the number of clusters
+k <- 6
 
+# Vector to store ARI values
+ari_values <- numeric(100)
+
+# Loop to calculate ARI 100 times
+for (i in 1:100) {
+  
+  # Reset SCE object for SC3 calculations
+  sce <- sc3_prepare(sce)
+  sce <- sc3_calc_dists(sce)
+  sce <- sc3_calc_transfs(sce)
+  sce <- sc3_kmeans(sce, ks = k)
+  sce <- sc3_calc_consens(sce)
+  
+  # Get SC3 clusters
+  clusters <- colData(sce)$sc3_6_clusters
+  
+  # Compute the ARI and store in the vector
+  ari_values[i] <- adjustedRandIndex(clusters, true_labels)
+}
+
+# Compute and print the average ARI
+average_ari <- mean(ari_values)
+cat("Average ARI over 100 iterations:", average_ari, "\n")
+
+# Store the ARI values for further use
+write.csv(ari_values, file="ari_values.csv", row.names=FALSE)
