@@ -148,14 +148,3 @@ def sc3_clustering(data, true_labels):
 # Define normalization and dimension reduction methods
 normalization_methods = [tmm_normalization, linnorm_normalization, scale_normalization]
 dimension_reduction_methods = [pca_reduction, tsne_reduction]
-
-# def test(data):
-#     for normalization_method in normalization_methods:
-#         normalized_data = normalization_method(data)
-#         for dimension_reduction_method in dimension_reduction_methods:
-#             print(f"Testing combination of {normalization_method.__name__} and {dimension_reduction_method.__name__}")
-#             reduced_data = dimension_reduction_method(normalized_data)
-#             print(f"Shape of reduced data: {reduced_data.shape}")
-#
-#
-# test(usoskin_expression_matrix)
