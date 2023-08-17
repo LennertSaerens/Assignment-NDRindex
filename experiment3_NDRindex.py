@@ -28,7 +28,7 @@ r_results_mapping = {
         'sc3_ARI': 0.6584306
     },
     'biase': {
-        'sc3_ARI': 0.708
+        'sc3_ARI': 0.9516773
     },
     'deng': {
         'sc3_ARI': 0.708
