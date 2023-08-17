@@ -31,10 +31,10 @@ r_results_mapping = {
         'sc3_ARI': 0.9516773
     },
     'deng': {
-        'sc3_ARI': 0.708
+        'sc3_ARI': 0.4964559
     },
     'usoskin': {
-        'sc3_ARI': 0.708
+        'sc3_ARI': 0.8804224
     }
 }
 
@@ -71,24 +71,43 @@ for dataset_name, (data, labels) in datasets.items():
 
 # VISUALIZATION
 
-# Convert ARI results into long form DataFrame
+# Convert ARI results and r_results_mapping into long form DataFrame
+dataset_names = []
+ari_scores = []
+score_types = []
+
+# Append NDRindex scores
+for dataset, (avg_ari, aris) in ari_results.items():
+    dataset_names.extend([dataset] * len(aris))
+    ari_scores.extend(aris)
+    score_types.extend(['NDRindex'] * len(aris))
+
+# Append sc3_ARI scores
+for dataset, scores in r_results_mapping.items():
+    dataset_names.append(dataset)
+    ari_scores.append(scores['sc3_ARI'])
+    score_types.append('sc3_ARI')
+
 ari_df = pd.DataFrame({
-    'Dataset': [dataset for dataset in ari_results.keys() for _ in range(len(ari_results[dataset][1]))],
-    'ARI': [ari for scores in ari_results.values() for ari in scores[1]]
+    'Dataset': dataset_names,
+    'ARI': ari_scores,
+    'Score Type': score_types
 })
 
 # Plot using Seaborn
 plt.figure(figsize=(12, 8))
 
 # Use barplot to display the average ARI scores as rectangles
-sns.barplot(data=ari_df, x='Dataset', y='ARI', ci=None, color='lightblue', estimator=np.mean)
+sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', ci=None, estimator=np.mean, palette="pastel")
 
-# Use stripplot to show individual ARI scores as dots
-sns.stripplot(data=ari_df, x='Dataset', y='ARI', jitter=True, marker='o', alpha=0.7, color='black')
+# Use stripplot to show individual NDRindex ARI scores as dots
+sns.stripplot(data=ari_df[ari_df['Score Type'] == 'NDRindex'], x='Dataset', y='ARI', jitter=True, marker='o', alpha=0.7, color='black')
 
-plt.title('Distribution of ARI scores for different datasets using NDRindex')
+plt.title('Distribution of ARI scores for different datasets')
 plt.ylabel('Adjusted Rand Index (ARI)')
 plt.xlabel('Dataset')
 plt.tight_layout()
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.legend(title='Score Type')
 plt.show()
+
