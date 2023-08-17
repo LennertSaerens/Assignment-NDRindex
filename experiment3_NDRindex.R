@@ -3,6 +3,7 @@ library(SC3)
 library(SingleCellExperiment)
 library(mclust)
 library(RCSL)
+library(SparseMDC)
 
 # Load the 'yan' dataset
 data(yan)
