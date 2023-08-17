@@ -23,6 +23,21 @@ method_mapping = {
     'tsne_reduction': tsne_reduction
 }
 
+r_results_mapping = {
+    'yan': {
+        'sc3_ARI': 0.6584306
+    },
+    'biase': {
+        'sc3_ARI': 0.708
+    },
+    'deng': {
+        'sc3_ARI': 0.708
+    },
+    'usoskin': {
+        'sc3_ARI': 0.708
+    }
+}
+
 
 def compute_ARI_with_best_methods(data, true_labels, best_methods, num_runs=100):
     normalization_method = method_mapping[best_methods[0]]
