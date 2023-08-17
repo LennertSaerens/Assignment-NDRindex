@@ -98,10 +98,7 @@ ari_df = pd.DataFrame({
 plt.figure(figsize=(12, 8))
 
 # Use barplot to display the average ARI scores as rectangles
-sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', ci=None, estimator=np.mean, palette="pastel")
-
-# Use stripplot to show individual NDRindex ARI scores as dots
-sns.stripplot(data=ari_df[ari_df['Score Type'] == 'NDRindex'], x='Dataset', y='ARI', jitter=True, marker='o', alpha=0.7, color='black')
+sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', errorbar=None, estimator=np.mean, palette="pastel")
 
 plt.title('Distribution of ARI scores for different datasets')
 plt.ylabel('Adjusted Rand Index (ARI)')
