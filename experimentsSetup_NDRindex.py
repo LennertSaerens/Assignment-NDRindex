@@ -6,8 +6,6 @@ from rpy2.robjects.packages import importr
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
-from rpy2.robjects.vectors import ListVector
-from rpy2.robjects import DataFrame
 
 numpy2ri.activate()  # Activate the NumPy to R conversion
 pandas2ri.activate()  # Activate the Pandas to R conversion
@@ -63,16 +61,6 @@ usoskin_labels_R = robjects.r['$'](usoskin_metadata, 'Level.1')
 usoskin_true_labels = np.array(usoskin_labels_R).flatten()
 
 
-# print(f"Yan dataset shape: {yan_expression_matrix.shape}")
-# print(f"Biase dataset shape: {biase_expression_matrix.shape}")
-# print(f"Deng dataset shape: {deng_expression_matrix.shape}")
-# print(f"Usoskin dataset shape: {usoskin_expression_matrix.shape}")
-# print(f"Yan true labels shape: {yan_true_labels.shape}")
-# print(f"Biase true labels shape: {biase_true_labels.shape}")
-# print(f"Deng true labels shape: {deng_true_labels.shape}")
-# print(f"Usoskin true labels shape: {usoskin_true_labels.shape}")
-
-
 def tmm_normalization(data_np):
     # Remove rows with all zeros
     data_np = data_np[~np.all(data_np == 0, axis=1)]
@@ -112,37 +100,6 @@ def pca_reduction(data, n_components=2):
 def tsne_reduction(data, n_components=2):
     tsne = TSNE(n_components=n_components)
     return tsne.fit_transform(data)
-
-
-def sc3_clustering(data, true_labels):
-    # Convert data to R matrix
-    data_r = numpy2ri.py2rpy(data)
-
-    # Create a SingleCellExperiment object in R
-    sce = SingleCellExperiment.SingleCellExperiment(assays=ListVector({"counts": data_r}))
-
-    # Add dummy gene names to rowData
-    num_genes = data.shape[0]
-    dummy_gene_names = robjects.StrVector(["Gene" + str(i + 1) for i in range(num_genes)])
-
-    # Assign data and dummy gene names to R environment
-    robjects.r.assign("sce", sce)
-    robjects.r.assign("dummy_gene_names", dummy_gene_names)
-
-    # Calculate logcounts (using a simple log transformation as an example)
-    # Set the rownames, feature_symbol, and logcounts within the R environment
-    true_k = len(np.unique(true_labels))
-    robjects.r('''
-        rownames(sce) <- dummy_gene_names
-        rowData(sce)$feature_symbol <- rownames(sce)
-        logcounts(sce) <- log2(counts(sce) + 1)
-        sce <- SC3::sc3(sce, ks={})
-    '''.format(true_k))
-
-    # Extract SC3 clustering results
-    sc3_results = robjects.r('sce@colData$sc3_{}clusters'.format(true_k))
-
-    return np.array(sc3_results)
 
 
 # Define normalization and dimension reduction methods
