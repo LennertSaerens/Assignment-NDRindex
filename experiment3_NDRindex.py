@@ -92,6 +92,11 @@ for dataset, scores in r_results_mapping.items():
     ari_scores.append(scores['sc3_ARI'])
     score_types.append('sc3_ARI')
 
+    # Append pcaReduce_ARI scores
+    dataset_names.append(dataset)
+    ari_scores.append(scores['pcaReduce_ARI'])
+    score_types.append('pcaReduce_ARI')
+
 ari_df = pd.DataFrame({
     'Dataset': dataset_names,
     'ARI': ari_scores,
@@ -102,7 +107,7 @@ ari_df = pd.DataFrame({
 plt.figure(figsize=(12, 8))
 
 # Use barplot to display the average ARI scores as rectangles
-sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', errorbar=None, estimator=np.mean, palette="pastel")
+sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', ci=None, estimator=np.mean, palette="pastel")
 
 plt.title('Distribution of ARI scores for different datasets')
 plt.ylabel('Adjusted Rand Index (ARI)')
@@ -111,4 +116,3 @@ plt.tight_layout()
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.legend(title='Score Type')
 plt.show()
-
