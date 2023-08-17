@@ -25,20 +25,28 @@ method_mapping = {
 
 r_results_mapping = {
     'yan': {
-        'sc3_ARI': 0.6584306,
-        'pcaReduce_ARI': 0.8258125
+        'SC3': 0.6584306,
+        'pcaReduce': 0.8258125,
+        'SNN-Cliq': 0.5777778,
+        'Seurat': 0.6911318
     },
     'biase': {
-        'sc3_ARI': 0.9516773,
-        'pcaReduce_ARI': 0.9475349
+        'SC3': 0.9516773,
+        'pcaReduce': 0.9475349,
+        'SNN-Cliq': 0.6034298,
+        'Seurat': 0.8775349
     },
     'deng': {
-        'sc3_ARI': 0.4964559,
-        'pcaReduce_ARI': 0.4467143
+        'SC3': 0.4964559,
+        'pcaReduce': 0.4467143,
+        'SNN-Cliq': 0.3378124,
+        'Seurat': 0.3685968
     },
     'usoskin': {
-        'sc3_ARI': 0.8804224,
-        'pcaReduce_ARI': 0.5681257
+        'SC3': 0.8804224,
+        'pcaReduce': 0.5681257,
+        'SNN-Cliq': 0.2874987,
+        'Seurat': 0.5653912
     }
 }
 
@@ -89,13 +97,23 @@ for dataset, (avg_ari, aris) in ari_results.items():
 # Append sc3_ARI scores
 for dataset, scores in r_results_mapping.items():
     dataset_names.append(dataset)
-    ari_scores.append(scores['sc3_ARI'])
-    score_types.append('sc3_ARI')
+    ari_scores.append(scores['SC3'])
+    score_types.append('SC3')
 
     # Append pcaReduce_ARI scores
     dataset_names.append(dataset)
-    ari_scores.append(scores['pcaReduce_ARI'])
-    score_types.append('pcaReduce_ARI')
+    ari_scores.append(scores['pcaReduce'])
+    score_types.append('pcaReduce')
+
+    # Append SNN-Cliq_ARI scores
+    dataset_names.append(dataset)
+    ari_scores.append(scores['SNN-Cliq'])
+    score_types.append('SNN-Cliq')
+
+    # Append Seurat_ARI scores
+    dataset_names.append(dataset)
+    ari_scores.append(scores['Seurat'])
+    score_types.append('Seurat')
 
 ari_df = pd.DataFrame({
     'Dataset': dataset_names,
@@ -107,7 +125,7 @@ ari_df = pd.DataFrame({
 plt.figure(figsize=(12, 8))
 
 # Use barplot to display the average ARI scores as rectangles
-sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', ci=None, estimator=np.mean, palette="pastel")
+sns.barplot(data=ari_df, x='Dataset', y='ARI', hue='Score Type', errorbar=None, estimator=np.mean, palette="pastel")
 
 plt.title('Distribution of ARI scores for different datasets')
 plt.ylabel('Adjusted Rand Index (ARI)')
