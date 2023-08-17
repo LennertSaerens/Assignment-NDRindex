@@ -1,9 +1,12 @@
+# Load the necessary libraries
 library(SC3)
 library(SingleCellExperiment)
 library(mclust)
 library(RCSL)
 
+# Load the 'yan' dataset and its associated true labels
 data(yan)
+data(ann)
 
 # Convert the dataset to the appropriate format
 # Transpose the matrix since SC3 expects cells as rows and genes as columns
@@ -23,9 +26,10 @@ sce <- sc3_calc_consens(sce)
 # Get SC3 clusters
 clusters <- colData(sce)$sc3_clus_groups_k
 
-# Assuming you have the true labels for the yan dataset
-# true_labels <- ...  # Load or define the true labels here
+# Convert ann data to numeric for ARI computation
+true_labels <- as.numeric(ann)
 
 # Compute ARI
 ari_sc3 <- adjustedRandIndex(clusters, true_labels)
 
+print(ari_sc3)
