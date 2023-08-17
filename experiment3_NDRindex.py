@@ -25,16 +25,20 @@ method_mapping = {
 
 r_results_mapping = {
     'yan': {
-        'sc3_ARI': 0.6584306
+        'sc3_ARI': 0.6584306,
+        'pcaReduce_ARI': 0.8258125
     },
     'biase': {
-        'sc3_ARI': 0.9516773
+        'sc3_ARI': 0.9516773,
+        'pcaReduce_ARI': 0.9475349
     },
     'deng': {
-        'sc3_ARI': 0.4964559
+        'sc3_ARI': 0.4964559,
+        'pcaReduce_ARI': 0.4467143
     },
     'usoskin': {
-        'sc3_ARI': 0.8804224
+        'sc3_ARI': 0.8804224,
+        'pcaReduce_ARI': 0.5681257
     }
 }
 

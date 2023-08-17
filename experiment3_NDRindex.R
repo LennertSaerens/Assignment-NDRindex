@@ -5,6 +5,7 @@ library(mclust)
 library(RCSL)
 library(SparseMDC)
 library(scDatasets)
+library(pcaReduce)
 
 filter_threshold <- 1
 
@@ -19,16 +20,16 @@ filter_threshold <- 1
 # logcounts(yan_sce) <- log2(counts(yan_sce) + 1)
 # yan_true_labels <- as.numeric(as.factor(ann$cell_type1))
 
-# # Load the 'biase' dataset
-# data(data_biase)
-# biase_matrix <- as.matrix(data_biase)
-# biase_matrix <- biase_matrix[rowSums(biase_matrix) > filter_threshold, ]
-# biase_matrix_transposed <- t(biase_matrix)
-# biase_sce <- SingleCellExperiment(assays = list(counts = biase_matrix_transposed),
-#                                 rowData = DataFrame(feature_symbol = colnames(biase_matrix)))
-# logcounts(biase_sce) <- log2(counts(biase_sce) + 1)
-# biase_true_labels_raw <- cell_type_biase
-# biase_true_labels <- as.numeric(as.factor(biase_true_labels_raw))
+# Load the 'biase' dataset
+data(data_biase)
+biase_matrix <- as.matrix(data_biase)
+biase_matrix <- biase_matrix[rowSums(biase_matrix) > filter_threshold, ]
+biase_matrix_transposed <- t(biase_matrix)
+biase_sce <- SingleCellExperiment(assays = list(counts = biase_matrix_transposed),
+                                rowData = DataFrame(feature_symbol = colnames(biase_matrix)))
+logcounts(biase_sce) <- log2(counts(biase_sce) + 1)
+biase_true_labels_raw <- cell_type_biase
+biase_true_labels <- as.numeric(as.factor(biase_true_labels_raw))
 
 # # Load the 'deng' dataset
 # data(deng)
@@ -45,20 +46,20 @@ filter_threshold <- 1
 # # Extract true labels for the 'deng' dataset (directly from the original deng object)
 # deng_true_labels <- as.numeric(as.factor(deng$group))
 
-# Load the 'usoskin' dataset
-data(usoskin)
-# Extract count matrix directly
-usoskin_matrix <- assays(usoskin)$count
-# Filter genes (rows) that meet the threshold
-filter_rows <- which(rowSums(usoskin_matrix) > filter_threshold)
-# Subset the matrix
-usoskin_matrix <- usoskin_matrix[filter_rows, ]
-# Create SingleCellExperiment object without transposing
-usoskin_sce <- SingleCellExperiment(assays = list(counts = usoskin_matrix),
-                                 rowData = DataFrame(feature_symbol = rownames(usoskin_matrix)))
-logcounts(usoskin_sce) <- log2(counts(usoskin_sce) + 1)
-# Extract true labels for the 'usoskin' dataset (directly from the original usoskin object)
-usoskin_true_labels <- as.numeric(as.factor(usoskin$Level.1))
+# # Load the 'usoskin' dataset
+# data(usoskin)
+# # Extract count matrix directly
+# usoskin_matrix <- assays(usoskin)$count
+# # Filter genes (rows) that meet the threshold
+# filter_rows <- which(rowSums(usoskin_matrix) > filter_threshold)
+# # Subset the matrix
+# usoskin_matrix <- usoskin_matrix[filter_rows, ]
+# # Create SingleCellExperiment object without transposing
+# usoskin_sce <- SingleCellExperiment(assays = list(counts = usoskin_matrix),
+#                                  rowData = DataFrame(feature_symbol = rownames(usoskin_matrix)))
+# logcounts(usoskin_sce) <- log2(counts(usoskin_sce) + 1)
+# # Extract true labels for the 'usoskin' dataset (directly from the original usoskin object)
+# usoskin_true_labels <- as.numeric(as.factor(usoskin$Level.1))
 
 
 # The function to run SC3 clustering and calculate ARI
@@ -80,11 +81,37 @@ run_sc3_ari <- function(sce, k, true_labels) {
   return(ari_value)
 }
 
+run_pcaReduce_ari <- function(sce, k, true_labels) {
+  
+  # Extract the log-normalized counts from SCE
+  logcounts_matrix <- logcounts(sce)
+  
+  # Run pcaReduce
+  pca_clusters <- PCAreduce(logcounts_matrix, q = k, method = "S", nbt = 5)
+  
+  # Compute the ARI
+  ari_value <- adjustedRandIndex(pca_clusters$clusters, true_labels)
+  
+  return(ari_value)
+}
+
 # yan_sc3_ari = run_sc3_ari(yan_sce, 6, yan_true_labels)
 # cat("YAN_SC3_ARI:", yan_sc3_ari, "\n")
 # biase_sc3_ari = run_sc3_ari(biase_sce, 3, biase_true_labels)
 # cat("BIASE_SC3_ARI:", biase_sc3_ari, "\n")
 # usoskin_sc3_ari = run_sc3_ari(usoskin_sce, 10, usoskin_true_labels)
 # cat("DENG_SC3_ARI:", usoskin_sc3_ari, "\n")
-usoskin_sc3_ari = run_sc3_ari(usoskin_sce, 4, usoskin_true_labels)
-cat("USOSKIN_SC3_ARI:", usoskin_sc3_ari, "\n")
+# usoskin_sc3_ari = run_sc3_ari(usoskin_sce, 4, usoskin_true_labels)
+# cat("USOSKIN_SC3_ARI:", usoskin_sc3_ari, "\n")
+
+# yan_pcaReduce_ari = run_pcaReduce_ari(yan_sce, 6, yan_true_labels)
+# cat("YAN_pcaReduce_ARI:", yan_pcaReduce_ari, "\n")
+
+biase_pcaReduce_ari = run_pcaReduce_ari(biase_sce, 3, biase_true_labels)
+cat("BIASE_pcaReduce_ARI:", biase_pcaReduce_ari, "\n")
+# 
+# deng_pcaReduce_ari = run_pcaReduce_ari(deng_sce, 10, deng_true_labels)
+# cat("DENG_pcaReduce_ARI:", deng_pcaReduce_ari, "\n")
+# 
+# usoskin_pcaReduce_ari = run_pcaReduce_ari(usoskin_sce, 4, usoskin_true_labels)
+# cat("USOSKIN_pcaReduce_ARI:", usoskin_pcaReduce_ari, "\n")
