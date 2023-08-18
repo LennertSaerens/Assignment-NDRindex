@@ -83,7 +83,7 @@ fig, axes = plt.subplots(4, 4, figsize=(20, 20))
 
 for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_datasets, galaxy_datasets]):
     for j, data in enumerate(datasets):
-        axes[i, j].scatter(data[:, 0], data[:, 1], s=10)
+        axes[i, j].scatter(data[:, 0], data[:, 1], s=10, c='#89CFF0')
         axes[i, j].set_xlim(-10, 10)
         axes[i, j].set_ylim(-10, 10)
 
@@ -110,10 +110,10 @@ for i, datasets in enumerate([normal_datasets, square_datasets, hexagram_dataset
 x = ['large', 'medium', 'small']
 
 # Plot the NDRindex on the 4th column for each type of dataset
-axes[0, 3].plot(x, normal_ndr_indices, marker='o')
-axes[1, 3].plot(x, square_ndr_indices, marker='o')
-axes[2, 3].plot(x, hexagram_ndr_indices, marker='o')
-axes[3, 3].plot(x, galaxy_ndr_indices, marker='o')
+axes[0, 3].plot(x, normal_ndr_indices, marker='o', color='#89CFF0')
+axes[1, 3].plot(x, square_ndr_indices, marker='o', color='#89CFF0')
+axes[2, 3].plot(x, hexagram_ndr_indices, marker='o', color='#89CFF0')
+axes[3, 3].plot(x, galaxy_ndr_indices, marker='o', color='#89CFF0') 
 
 # Set the labels and titles
 axes[0, 0].set_title("Normal, large spread")
