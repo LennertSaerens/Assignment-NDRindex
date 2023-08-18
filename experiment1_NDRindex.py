@@ -113,7 +113,7 @@ x = ['large', 'medium', 'small']
 axes[0, 3].plot(x, normal_ndr_indices, marker='o', color='#89CFF0')
 axes[1, 3].plot(x, square_ndr_indices, marker='o', color='#89CFF0')
 axes[2, 3].plot(x, hexagram_ndr_indices, marker='o', color='#89CFF0')
-axes[3, 3].plot(x, galaxy_ndr_indices, marker='o', color='#89CFF0') 
+axes[3, 3].plot(x, galaxy_ndr_indices, marker='o', color='#89CFF0')
 
 # Set the labels and titles
 axes[0, 0].set_title("Normal, large spread")
