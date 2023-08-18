@@ -22,31 +22,31 @@ filter_threshold <- 1
 # logcounts(yan_sce) <- log2(counts(yan_sce) + 1)
 # yan_true_labels <- as.numeric(as.factor(ann$cell_type1))
 
-# # Load the 'biase' dataset
-# data(data_biase)
-# biase_matrix <- as.matrix(data_biase)
-# biase_matrix <- biase_matrix[rowSums(biase_matrix) > filter_threshold, ]
-# biase_matrix_transposed <- t(biase_matrix)
-# biase_sce <- SingleCellExperiment(assays = list(counts = biase_matrix_transposed),
-#                                 rowData = DataFrame(feature_symbol = colnames(biase_matrix)))
-# logcounts(biase_sce) <- log2(counts(biase_sce) + 1)
-# biase_true_labels_raw <- cell_type_biase
-# biase_true_labels <- as.numeric(as.factor(biase_true_labels_raw))
+# Load the 'biase' dataset
+data(data_biase)
+biase_matrix <- as.matrix(data_biase)
+biase_matrix <- biase_matrix[rowSums(biase_matrix) > filter_threshold, ]
+biase_matrix_transposed <- t(biase_matrix)
+biase_sce <- SingleCellExperiment(assays = list(counts = biase_matrix_transposed),
+                                rowData = DataFrame(feature_symbol = colnames(biase_matrix)))
+logcounts(biase_sce) <- log2(counts(biase_sce) + 1)
+biase_true_labels_raw <- cell_type_biase
+biase_true_labels <- as.numeric(as.factor(biase_true_labels_raw))
 
-# # Load the 'deng' dataset
-# data(deng)
-# # Extract count matrix directly
-# deng_matrix <- assays(deng)$count
-# # Filter genes (rows) that meet the threshold
-# filter_rows <- which(rowSums(deng_matrix) > filter_threshold)
-# # Subset the matrix
-# deng_matrix <- deng_matrix[filter_rows, ]
-# # Create SingleCellExperiment object without transposing
-# deng_sce <- SingleCellExperiment(assays = list(counts = deng_matrix),
-#                                  rowData = DataFrame(feature_symbol = rownames(deng_matrix)))
-# logcounts(deng_sce) <- log2(counts(deng_sce) + 1)
-# # Extract true labels for the 'deng' dataset (directly from the original deng object)
-# deng_true_labels <- as.numeric(as.factor(deng$group))
+# Load the 'deng' dataset
+data(deng)
+# Extract count matrix directly
+deng_matrix <- assays(deng)$count
+# Filter genes (rows) that meet the threshold
+filter_rows <- which(rowSums(deng_matrix) > filter_threshold)
+# Subset the matrix
+deng_matrix <- deng_matrix[filter_rows, ]
+# Create SingleCellExperiment object without transposing
+deng_sce <- SingleCellExperiment(assays = list(counts = deng_matrix),
+                                 rowData = DataFrame(feature_symbol = rownames(deng_matrix)))
+logcounts(deng_sce) <- log2(counts(deng_sce) + 1)
+# Extract true labels for the 'deng' dataset (directly from the original deng object)
+deng_true_labels <- as.numeric(as.factor(deng$group))
 
 # Load the 'usoskin' dataset
 data(usoskin)
@@ -184,5 +184,5 @@ run_seurat_ari <- function(sce, resolution, true_labels) {
 # cat("BIASE_Seurat_ARI:", biase_seurat_ari, "\n")
 # deng_seurat_ari = run_seurat_ari(deng_sce, resolution = 0.5, deng_true_labels)
 # cat("DENG_Seurat_ARI:", deng_seurat_ari, "\n")
-usoskin_seurat_ari = run_seurat_ari(usoskin_sce, resolution = 0.5, usoskin_true_labels)
-cat("USOSKIN_Seurat_ARI:", usoskin_seurat_ari, "\n")
+# usoskin_seurat_ari = run_seurat_ari(usoskin_sce, resolution = 0.5, usoskin_true_labels)
+# cat("USOSKIN_Seurat_ARI:", usoskin_seurat_ari, "\n")
